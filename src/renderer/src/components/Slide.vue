@@ -3,7 +3,7 @@
     class="border border-zinc-400 dark:border-zinc-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 flex flex-col"
   >
     <header class="flex justify-between w-full h-9 items-center">
-      <div class="w-1/6"></div>
+      <div></div>
       <div class="inline-flex items-center space-x-2">
         <div class="w-2 h-2 rounded-full overflow-hidden relative">
           <input
@@ -21,7 +21,7 @@
           :style="{ width: `${fileNameInputSize}ch` }"
         />
       </div>
-      <div class="flex space-x-3 justify-center w-1/6">
+      <div class="flex space-x-3 justify-center mx-2">
         <span class="material-icons-round">remove</span>
         <span class="material-icons-round">crop_square</span>
         <span class="material-icons-round">close</span>
