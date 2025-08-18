@@ -1,76 +1,88 @@
 <template>
   <section
-    class="border border-zinc-400 dark:border-zinc-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 flex flex-col"
+    class="border border-zinc-400 dark:border-zinc-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 backdrop-blur-lg flex flex-col"
   >
-    <header class="flex justify-between w-full h-9 items-center">
-      <div></div>
-      <div class="inline-flex items-center space-x-2">
-        <div class="w-2 h-2 rounded-full overflow-hidden relative">
+    <header
+      class="flex justify-between w-full h-12 space-x-4 items-center text-zinc-600 dark:text-zinc-400"
+    >
+      <div class="w-1/3 flex items-center justify-start space-x-2 ml-4">
+        <div class="overflow-hidden relative">
           <input
-            class="absolute border-none overflow-hidden left-1/2 -translate-1/2 m-0 p-0"
+            class="absolute z-10 inset-0 border-none outline-none opacity-0"
             type="color"
             tabindex="-1"
-            :value="state.input.color"
+            v-model="data.color"
+            @input="throttleColor"
           />
+          <span class="material-icons-round" :style="{ color: iconColor }"
+            >code</span
+          >
         </div>
-        <input
-          type="text"
-          tabindex="-1"
-          class="bg-transparent text-center border-none outline-none font-medium text-zinc-600 dark:text-zinc-400 text-xs min-w-[7ch] max-w-[50ch]"
-          v-model="state.input.fileName"
-          :style="{ width: `${fileNameInputSize}ch` }"
-        />
       </div>
-      <div class="flex space-x-3 justify-center mx-2">
+      <input
+        type="text"
+        tabindex="-1"
+        class="w-1/3 bg-transparent text-center border-none outline-none font-medium text-xs min-w-[7ch] max-w-[50ch]"
+        v-model="data.fileName"
+        :style="{ width: `${fileNameInputSize}ch` }"
+      />
+      <div class="w-1/3 flex space-x-3 justify-end mr-4">
         <span class="material-icons-round">remove</span>
         <span class="material-icons-round">crop_square</span>
         <span class="material-icons-round">close</span>
       </div>
     </header>
 
-    <article class="relative p-4 font-mono">
-      <textarea
-        spellcheck="false"
-        class="relative overflow-hidden whitespace-nowrap focus-visible:outline-none resize-none text-transparent bg-transparent w-full z-10 h-full caret-black dark:caret-white min-h-40 code-font"
-        v-model="state.input.code"
-      >
-      </textarea>
-      <!-- This specific value (0.3125rem) corresponds to the 5px gap between the parsed code and the textarea to seamlessly overlap. -->
-      <section class="absolute inset-0 -top-[0.3125rem] w-full h-full">
-        <pre
-          :class="`relative language-${state.language.language}`"
-          v-html="highlightedCode"
-        ></pre>
+    <article class="flex space-x-3 min-h-[30rem]">
+      <aside class="w-1/12 h-full p-4">AAAAA</aside>
+      <section class="relative p-4 w-full h-full">
+        <volt-textarea
+          spellcheck="false"
+          class="relative overflow-hidden whitespace-nowrap border-0! outline-none! resize-none text-transparent! bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
+          v-model="data.code"
+          autoResize
+        />
+        <section class="absolute inset-0 left-[0.8rem] w-full h-full">
+          <pre
+            :class="`relative language-${data.language.name}`"
+            v-html="highlightedCode"
+          ></pre>
+        </section>
       </section>
     </article>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from "vue";
+import { computed, onMounted, ref } from "vue";
+import _ from "lodash";
 import Prism from "prismjs";
+import { SlideData } from "@renderer/types";
+import VoltTextarea from "@renderer/volt/Textarea.vue";
 
-const state = reactive({
-  language: {
-    grammar: Prism.languages.javascript,
-    language: "javascript",
-  },
-  input: {
-    color: "#2B7FFF",
-    fileName: "code.rs",
-    code: "const isExample = animations.some(() => {})",
-  },
+const data = defineModel<SlideData>({
+  required: true,
+});
+
+const iconColor = ref("");
+
+const throttleColor = _.throttle(() => {
+  iconColor.value = data.value.color;
+}, 100);
+
+onMounted(() => {
+  iconColor.value = data.value.color;
 });
 
 const highlightedCode = computed(() => {
   return Prism.highlight(
-    state.input.code,
-    state.language.grammar,
-    state.language.language,
+    data.value.code,
+    data.value.language.grammar,
+    data.value.language.name,
   );
 });
 
 const fileNameInputSize = computed(() => {
-  return state.input.fileName.length;
+  return data.value.fileName.length;
 });
 </script>

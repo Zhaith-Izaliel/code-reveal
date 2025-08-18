@@ -1,7 +1,9 @@
 <template>
-  <slide></slide>
+  <div class="min-w-full min-h-full">
+    <slide-manager></slide-manager>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Slide from "@renderer/components/Slide.vue";
+import SlideManager from "@renderer/components/SlideManager.vue";
 </script>

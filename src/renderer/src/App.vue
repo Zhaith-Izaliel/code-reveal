@@ -7,7 +7,7 @@ import { changeTheme } from "@renderer/utils";
 import { onMounted } from "vue";
 
 onMounted(() => {
-  changeTheme("os");
+  changeTheme("dark");
 
   // FIXME: use electron instead of that
   document.documentElement.classList.toggle(
