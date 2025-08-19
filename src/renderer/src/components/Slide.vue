@@ -11,78 +11,135 @@
             class="absolute z-10 inset-0 border-none outline-none opacity-0"
             type="color"
             tabindex="-1"
-            v-model="data.color"
-            @input="throttleColor"
+            v-model="color"
           />
-          <span class="material-icons-round" :style="{ color: iconColor }"
-            >code</span
-          >
+          <span class="pi pi-code" :style="{ color: color }"></span>
         </div>
       </div>
       <input
         type="text"
         tabindex="-1"
         class="w-1/3 bg-transparent text-center border-none outline-none font-medium text-xs min-w-[7ch] max-w-[50ch]"
-        v-model="data.fileName"
+        v-model="fileName"
         :style="{ width: `${fileNameInputSize}ch` }"
       />
       <div class="w-1/3 flex space-x-3 justify-end mr-4">
-        <span class="material-icons-round">remove</span>
-        <span class="material-icons-round">crop_square</span>
-        <span class="material-icons-round">close</span>
+        <span class="pi pi-minus"></span>
+        <span class="pi pi-stop"></span>
+        <span class="pi pi-times"></span>
       </div>
     </header>
 
-    <article class="flex space-x-3 min-h-[30rem]">
-      <aside class="w-1/12 h-full p-4">AAAAA</aside>
-      <section class="relative p-4 w-full h-full">
-        <volt-textarea
-          spellcheck="false"
-          class="relative overflow-hidden whitespace-nowrap border-0! outline-none! resize-none text-transparent! bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
-          v-model="data.code"
-          autoResize
-        />
-        <section class="absolute inset-0 left-[0.8rem] w-full h-full">
-          <pre
-            :class="`relative language-${data.language.name}`"
-            v-html="highlightedCode"
-          ></pre>
-        </section>
+    <article
+      ref="preview"
+      class="flex space-x-3 min-h-[30rem] relative w-full h-full p-4"
+    >
+      <volt-textarea
+        spellcheck="false"
+        class="relative overflow-hidden whitespace-nowrap border-none text-transparent! outline-none! shadow-transparent! resize-none bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
+        v-model="code"
+        autoResize
+      />
+      <section class="absolute inset-0 pl-3 w-full h-full">
+        <!--prettier-ignore-->
+        <pre :class="`relative language-${props.language.name}`"><code v-html="highlightedCode"></code></pre>
       </section>
     </article>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
 import _ from "lodash";
 import Prism from "prismjs";
-import { SlideData } from "@renderer/types";
+import { toPng } from "html-to-image";
+import { useTheme } from "@renderer/hooks";
+import { PrismData } from "@/types";
+
 import VoltTextarea from "@renderer/volt/Textarea.vue";
 
-const data = defineModel<SlideData>({
+const { config } = window;
+
+const { theme } = useTheme();
+
+const code = defineModel<string>("code", {
   required: true,
 });
 
-const iconColor = ref("");
-
-const throttleColor = _.throttle(() => {
-  iconColor.value = data.value.color;
-}, 100);
-
-onMounted(() => {
-  iconColor.value = data.value.color;
+const color = defineModel<string>("color", {
+  required: true,
 });
 
-const highlightedCode = computed(() => {
+const fileName = defineModel<string>("fileName", {
+  required: true,
+});
+
+const previewImage = defineModel<string>("preview", {
+  default: "",
+});
+
+const props = defineProps<{
+  language: PrismData;
+}>();
+
+const iconColor = ref<string>("");
+
+const previewDOMElement = useTemplateRef("preview");
+
+onMounted(async () => {
+  iconColor.value = color.value;
+  generatePreview();
+});
+
+const highlightedCode = computed((): string => {
+  if (code.value === "") {
+    return "";
+  }
+
   return Prism.highlight(
-    data.value.code,
-    data.value.language.grammar,
-    data.value.language.name,
+    code.value,
+    props.language.grammar,
+    props.language.name,
   );
 });
 
 const fileNameInputSize = computed(() => {
-  return data.value.fileName.length;
+  return fileName.value.length;
+});
+
+const generatePreview = () => {
+  if (!previewDOMElement.value) {
+    return;
+  }
+
+  toPng(previewDOMElement.value, {
+    width: config.preview.width,
+    height: config.preview.height,
+    skipAutoScale: config.preview.skipAutoScale,
+    backgroundColor: config.preview.backgroundColor(theme.value),
+    cacheBust: config.preview.cacheBust,
+  })
+    .then((dataUrl) => {
+      console.log(dataUrl);
+      previewImage.value = dataUrl;
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+
+watch(
+  highlightedCode,
+  _.throttle(async (newCode, oldCode) => {
+    if (newCode === oldCode) {
+      return;
+    }
+
+    generatePreview();
+  }, config.preview.throttle),
+);
+
+watch(theme, async () => {
+  generatePreview();
 });
 </script>

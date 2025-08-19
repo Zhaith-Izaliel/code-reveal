@@ -5,6 +5,9 @@ import App from "@renderer/App.vue";
 import PrimeVue from "primevue/config";
 
 import "@renderer/styles/all.css";
+import { setTheme } from "./utils";
+
+await setTheme("system");
 
 createApp(App)
   .use(router)

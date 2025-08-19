@@ -28,7 +28,7 @@
  * --syntax-cursor-line: hsla(220, 100%, 80%, 0.04);
  */
 
-html[data-theme="dark"] {
+:root[data-theme="dark"] {
   code[class*="language-"],
   pre[class*="language-"] {
     color: hsl(220, 14%, 71%);

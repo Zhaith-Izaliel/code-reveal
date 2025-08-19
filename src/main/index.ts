@@ -1,7 +1,15 @@
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  nativeTheme,
+  NativeTheme,
+} from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
+import { Theme } from "../types";
 
 /**
  *
@@ -75,3 +83,13 @@ app.on("window-all-closed", () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+ipcMain.handle("theme:set", (_, theme: NativeTheme["themeSource"]): Theme => {
+  nativeTheme.themeSource = theme;
+  return nativeTheme.shouldUseDarkColors ? "dark" : "light";
+});
+
+ipcMain.handle(
+  "theme:get",
+  (): Theme => (nativeTheme.shouldUseDarkColors ? "dark" : "light"),
+);

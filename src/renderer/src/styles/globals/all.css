@@ -2,6 +2,8 @@
   @apply bg-zinc-50 text-zinc-900;
   font-size: 12pt;
 
+  color-scheme: light dark;
+
   @variant dark {
     @apply bg-zinc-900 text-zinc-50;
   }

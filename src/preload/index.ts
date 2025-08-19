@@ -1,5 +1,7 @@
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import { config } from "../config";
+import { ElectronTheme, Theme } from "../types";
 
 // Custom APIs for renderer
 const api = {};
@@ -11,6 +13,12 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
+    contextBridge.exposeInMainWorld("config", config);
+    contextBridge.exposeInMainWorld("theme", {
+      set: (theme: ElectronTheme): Promise<Theme> =>
+        ipcRenderer.invoke("theme:set", theme),
+      get: (): Promise<Theme> => ipcRenderer.invoke("theme:get"),
+    });
   } catch (error) {
     console.error(error);
   }
