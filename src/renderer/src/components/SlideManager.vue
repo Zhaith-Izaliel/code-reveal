@@ -22,13 +22,14 @@
             :preview="slide.preview"
           ></slide-preview>
         </li>
-        <li>
-          <secondary-button
+        <li class="text-2xl backdrop-blur-2xl h-preview-slide rounded-xl">
+          <prime-button
             @click.prevent="createSlide"
-            variant="outlined"
+            variant="text"
+            severity="secondary"
             raised
             icon="pi pi-plus"
-            class="h-preview-slide w-full! p-0 border border-zinc-600 dark:border-zinc-800 rounded-xl"
+            class="h-full w-full! p-0 border border-zinc-600 dark:border-zinc-800"
           />
         </li>
       </ul>
@@ -50,11 +51,11 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 
-import Slide from "./Slide.vue";
+import Slide from "./Slide/Slide.vue";
 import SlidePreview from "./SlidePreview.vue";
-import SecondaryButton from "@renderer/volt/SecondaryButton.vue";
 import { SlideData } from "@/types";
 import Prism from "prismjs";
+import { Button as PrimeButton } from "primevue";
 
 const { config } = window;
 

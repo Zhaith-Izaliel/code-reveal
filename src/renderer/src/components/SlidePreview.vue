@@ -14,24 +14,28 @@
       class="rounded-xl h-preview-slide"
     ></div>
     <header
-      class="h-4 absolute w-1/3 top-0 right-0 p-2 flex justify-end space-x-2 text-zinc-800 dark:text-zinc-400 text-xs"
+      class="absolute w-1/3 top-0 right-0 p-2 flex justify-end space-x-2 text-zinc-800 dark:text-zinc-400 text-xs"
     >
-      <secondary-button
-        variant="text"
-        raised
+      <prime-button
         icon="pi pi-clone"
-        class="h-full w-6!"
+        variant="text"
+        severity="secondary"
+        raised
+        class="h-6"
+        v-tooltip.bottom="'Duplicate'"
         @click.prevent="
           () => {
             emit('duplicate', index);
           }
         "
       />
-      <secondary-button
-        variant="text"
-        raised
+      <prime-button
         icon="pi pi-trash"
-        class="h-full w-6!"
+        variant="text"
+        severity="secondary"
+        raised
+        class="h-6"
+        v-tooltip.bottom="'Delete'"
         @click.prevent="
           () => {
             emit('delete', index);
@@ -47,7 +51,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import SecondaryButton from "@renderer/volt/SecondaryButton.vue";
+import { Button as PrimeButton } from "primevue";
 import { useTheme } from "@renderer/hooks";
 
 const { config } = window;

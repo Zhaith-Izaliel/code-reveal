@@ -28,7 +28,7 @@
  * --syntax-cursor-line: hsla(230, 8%, 24%, 0.05);
  */
 
-:root:not([data-theme="dark"]) {
+:root:not([class="app-dark"]) {
   code[class*="language-"],
   pre[class*="language-"] {
     color: hsl(230, 8%, 24%);

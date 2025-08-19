@@ -5,15 +5,16 @@
     <header
       class="flex justify-between w-full h-12 space-x-4 items-center text-zinc-600 dark:text-zinc-400"
     >
-      <div class="w-1/3 flex items-center justify-start space-x-2 ml-4">
-        <div class="overflow-hidden relative">
-          <input
-            class="absolute z-10 inset-0 border-none outline-none opacity-0"
-            type="color"
-            tabindex="-1"
+      <div class="w-1/3 flex ml-4">
+        <div class="overflow-hidden relative flex items-center justify-start">
+          <color-picker
+            class="absolute z-10 inset-0 opacity-0"
             v-model="color"
           />
-          <span class="pi pi-code" :style="{ color: color }"></span>
+          <span
+            class="pi pi-code absolute inset-0"
+            :style="{ color: `#${color}` }"
+          ></span>
         </div>
       </div>
       <input
@@ -32,34 +33,32 @@
 
     <article
       ref="preview"
-      class="flex space-x-3 min-h-[30rem] relative w-full h-full p-4"
+      class="flex space-x-3 min-h-[30rem] relative w-full h-full p-4 font-mono!"
     >
-      <volt-textarea
+      <prime-textarea
         spellcheck="false"
-        class="relative overflow-hidden whitespace-nowrap border-none text-transparent! outline-none! shadow-transparent! resize-none bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
+        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap text-transparent! border-none! outline-none! shadow-transparent! resize-none bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
         v-model="code"
         autoResize
       />
-      <section class="absolute inset-0 pl-3 w-full h-full">
+      <section class="absolute inset-0 w-full h-full">
         <!--prettier-ignore-->
-        <pre :class="`relative language-${props.language.name}`"><code v-html="highlightedCode"></code></pre>
+        <pre :class="`relative language-${language.name}`"><code v-html="highlightedCode"></code></pre>
       </section>
     </article>
   </section>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef, watch } from "vue";
+<script lang="ts" setup>
+import { computed, onMounted, useTemplateRef, watch } from "vue";
 import _ from "lodash";
 import Prism from "prismjs";
-import { toPng } from "html-to-image";
-import { useTheme } from "@renderer/hooks";
 import { PrismData } from "@/types";
-
-import VoltTextarea from "@renderer/volt/Textarea.vue";
+import { usePreviewGeneration } from "./Slide";
+import { Textarea as PrimeTextarea, ColorPicker } from "primevue";
+import { useTheme } from "@renderer/hooks";
 
 const { config } = window;
-
 const { theme } = useTheme();
 
 const code = defineModel<string>("code", {
@@ -78,18 +77,18 @@ const previewImage = defineModel<string>("preview", {
   default: "",
 });
 
-const props = defineProps<{
-  language: PrismData;
-}>();
+const props = withDefaults(
+  defineProps<{
+    generatePreview?: boolean;
+    language: PrismData;
+  }>(),
+  {
+    generatePreview: true,
+  },
+);
+const previewDOMElement = useTemplateRef<HTMLElement>("preview");
 
-const iconColor = ref<string>("");
-
-const previewDOMElement = useTemplateRef("preview");
-
-onMounted(async () => {
-  iconColor.value = color.value;
-  generatePreview();
-});
+const { generatePreview } = usePreviewGeneration();
 
 const highlightedCode = computed((): string => {
   if (code.value === "") {
@@ -107,26 +106,18 @@ const fileNameInputSize = computed(() => {
   return fileName.value.length;
 });
 
-const generatePreview = () => {
-  if (!previewDOMElement.value) {
-    return;
+const updatePreviewImage = async () => {
+  if (props.generatePreview) {
+    previewImage.value = await generatePreview(
+      previewDOMElement.value,
+      theme.value,
+    );
   }
-
-  toPng(previewDOMElement.value, {
-    width: config.preview.width,
-    height: config.preview.height,
-    skipAutoScale: config.preview.skipAutoScale,
-    backgroundColor: config.preview.backgroundColor(theme.value),
-    cacheBust: config.preview.cacheBust,
-  })
-    .then((dataUrl) => {
-      console.log(dataUrl);
-      previewImage.value = dataUrl;
-    })
-    .catch((err) => {
-      console.error(err);
-    });
 };
+
+onMounted(updatePreviewImage);
+
+watch(theme, updatePreviewImage);
 
 watch(
   highlightedCode,
@@ -135,11 +126,7 @@ watch(
       return;
     }
 
-    generatePreview();
+    await updatePreviewImage();
   }, config.preview.throttle),
 );
-
-watch(theme, async () => {
-  generatePreview();
-});
 </script>
