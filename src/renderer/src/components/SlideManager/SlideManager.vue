@@ -2,7 +2,7 @@
   <main class="flex h-full w-full">
     <aside
       :class="[
-        `min-h-screen h-full w-3/8 xl:w-1/6 bg-zinc-300/80 dark:bg-zinc-800/80 backdrop-blur-lg p-4 flex flex-col`,
+        `min-h-screen h-full w-3/8 xl:w-1/6 bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-lg p-4 flex flex-col`,
         {
           'opacity-20 pointer-events-none': isPreview,
         },
@@ -15,10 +15,10 @@
           v-for="(slide, i) in slides"
           v-if="slides.length > 0"
           :class="[
-            `p-0 border rounded-xl w-full cursor-pointer shadow shadow-black/80`,
+            `p-0 border rounded-xl w-full cursor-pointer shadow shadow-black/30 dark:shadow-black/80`,
             {
-              'border-zinc-600 dark:border-zinc-800': selectedIndex !== i,
-              'border-blue-500': selectedIndex === i,
+              'border-zinc-300 dark:border-zinc-800': selectedIndex !== i,
+              'border-blue-500 border-2': selectedIndex === i,
             },
           ]"
         >
@@ -44,11 +44,10 @@
       <footer class="text-2xl backdrop-blur-2xl h-preview-slide rounded-xl">
         <prime-button
           @click.prevent="createSlide"
-          variant="text"
           severity="secondary"
           raised
           icon="pi pi-plus"
-          class="h-full w-full! p-0 border border-zinc-600 dark:border-zinc-800"
+          class="h-full w-full! p-0"
         />
       </footer>
     </aside>

@@ -4,7 +4,7 @@
       :class="[
         `flex items-center justify-center space-x-3`,
         {
-          'pr-6 mr-6 border-r border-zinc-800 dark:border-zinc-600': !isPreview,
+          'pr-6 mr-6 border-r border-zinc-400 dark:border-zinc-600': !isPreview,
         },
       ]"
     >
