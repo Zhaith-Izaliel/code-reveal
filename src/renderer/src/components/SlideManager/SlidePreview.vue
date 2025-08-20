@@ -14,8 +14,34 @@
       class="rounded-xl h-preview-slide"
     ></div>
     <header
-      class="absolute w-1/3 top-0 right-0 p-2 flex justify-end space-x-2 text-zinc-800 dark:text-zinc-400 text-xs"
+      class="absolute w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-zinc-800 dark:text-zinc-400 text-xs"
     >
+      <prime-button
+        icon="pi pi-chevron-down"
+        variant="text"
+        severity="secondary"
+        raised
+        class="h-6"
+        v-tooltip.bottom="'Move down'"
+        @click.prevent="
+          () => {
+            emit('move-down', index);
+          }
+        "
+      />
+      <prime-button
+        icon="pi pi-chevron-up"
+        variant="text"
+        severity="secondary"
+        raised
+        class="h-6"
+        v-tooltip.bottom="'Move up'"
+        @click.prevent="
+          () => {
+            emit('move-up', index);
+          }
+        "
+      />
       <prime-button
         icon="pi pi-clone"
         variant="text"
@@ -67,5 +93,7 @@ const emit = defineEmits<{
   (e: "delete", index: number): void;
   (e: "duplicate", index: number): void;
   (e: "select", index: number): void;
+  (e: "move-up", index: number): void;
+  (e: "move-down", index: number): void;
 }>();
 </script>

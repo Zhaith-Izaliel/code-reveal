@@ -1,5 +1,5 @@
 @import "./code-font.css";
 
 .h-preview-slide {
-  @apply h-36 min-h-36;
+  @apply h-42 min-h-42;
 }

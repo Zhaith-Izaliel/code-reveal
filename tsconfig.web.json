@@ -8,7 +8,6 @@
     "src/types/*.d.ts"
   ],
   "compilerOptions": {
-    "composite": true,
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
