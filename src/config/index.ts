@@ -1,8 +1,7 @@
 import { SlideData, Theme } from "../types";
-import { v4 as uuidv4 } from "uuid";
 
 export type AppConfig = {
-  preview: {
+  thumbnail: {
     width: number;
     height: number;
     skipAutoScale: boolean;
@@ -23,11 +22,8 @@ export type AppConfig = {
 export const config: AppConfig = {
   slides: {
     defaultSlide: {
-      id: uuidv4(),
-      color: "2B7FFF",
-      fileName: "code.example",
       code: "",
-      preview: "",
+      thumbnail: "",
     },
 
     indent: {
@@ -35,7 +31,7 @@ export const config: AppConfig = {
       character: " ",
     },
   },
-  preview: {
+  thumbnail: {
     width: 800,
     height: 500,
     skipAutoScale: true,

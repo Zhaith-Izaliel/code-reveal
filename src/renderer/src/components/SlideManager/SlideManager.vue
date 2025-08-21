@@ -22,7 +22,7 @@
             },
           ]"
         >
-          <slide-preview
+          <slide-thumbnail
             @delete="deleteSlide"
             @duplicate="duplicateSlide"
             @select="selectSlide"
@@ -37,14 +37,15 @@
               }
             "
             :index="i"
-            :preview="slide.preview"
-          ></slide-preview>
+            :thumbnail="slide.thumbnail"
+          ></slide-thumbnail>
         </article>
       </draggable>
       <footer class="text-2xl backdrop-blur-2xl h-preview-slide rounded-xl">
         <prime-button
           @click.prevent="createSlide"
           severity="secondary"
+          v-tooltip.bottom="'Add a new slide'"
           raised
           icon="pi pi-plus"
           class="h-full w-full! p-0"
@@ -64,16 +65,13 @@
       <slide
         v-if="slides[selectedIndex]"
         v-model:code="slides[selectedIndex].code"
-        v-model:file-name="slides[selectedIndex].fileName"
-        v-model:color="slides[selectedIndex].color"
-        v-model:preview="slides[selectedIndex].preview"
+        v-model:file-name="fileName"
+        v-model:color="color"
+        v-model:thumbnail="slides[selectedIndex].thumbnail"
+        :is-preview="isPreview"
+        :generate-thumbnail="!isPreview"
         :language="language"
-        :class="[
-          `xl:w-2/5 m-auto mt-8`,
-          {
-            'border border-blue-500': isPreview,
-          },
-        ]"
+        class="xl:w-2/5 m-auto mt-8"
       />
     </section>
   </main>

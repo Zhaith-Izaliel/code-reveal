@@ -21,22 +21,23 @@ export default defineComponent({
     ColorPicker,
   },
 
-  emits: ["update:code", "update:color", "update:fileName", "update:preview"],
+  emits: ["update:code", "update:color", "update:fileName", "update:thumbnail"],
 
   props: {
-    generatePreview: { type: Boolean, default: true },
+    generateThumbnail: { type: Boolean, default: true },
     language: { type: Object as PropType<PrismData>, required: true },
     code: { type: String, required: true },
     color: { type: String, required: true },
     fileName: { type: String, required: true },
-    preview: { type: String, required: true },
+    thumbnail: { type: String, required: true },
+    isPreview: { Type: Boolean, required: true, default: false },
   },
 
   setup(props, { emit }) {
     const { config } = window;
     const { theme } = useTheme();
 
-    const previewDOMElement = useTemplateRef<HTMLElement>("preview");
+    const previewDOMElement = useTemplateRef<HTMLElement>("thumbnail");
 
     const updateFileName = (event: Event) => {
       emit("update:fileName", (event.target as HTMLInputElement).value);
@@ -58,40 +59,40 @@ export default defineComponent({
       return props.fileName.length;
     });
 
-    const generatePreview = (el: HTMLElement | null, theme: Theme) => {
+    const generateThumbnail = (el: HTMLElement | null, theme: Theme) => {
       if (!el) {
         return;
       }
 
       toPng(el, {
-        width: config.preview.width,
-        height: config.preview.height,
-        skipAutoScale: config.preview.skipAutoScale,
-        backgroundColor: config.preview.backgroundColor(theme),
-        cacheBust: config.preview.cacheBust,
+        width: config.thumbnail.width,
+        height: config.thumbnail.height,
+        skipAutoScale: config.thumbnail.skipAutoScale,
+        backgroundColor: config.thumbnail.backgroundColor(theme),
+        cacheBust: config.thumbnail.cacheBust,
       })
         .then((dataUrl) => {
-          emit("update:preview", dataUrl);
+          emit("update:thumbnail", dataUrl);
         })
         .catch((err) => {
           console.error(err);
         });
     };
 
-    const updatePreviewImage = () => {
-      if (props.generatePreview) {
-        generatePreview(previewDOMElement.value, theme.value);
+    const updateThumbnail = () => {
+      if (props.generateThumbnail) {
+        generateThumbnail(previewDOMElement.value, theme.value);
       }
     };
 
-    onMounted(updatePreviewImage);
+    onMounted(updateThumbnail);
 
     watch(theme, (newTheme, oldTheme) => {
       if (newTheme === oldTheme) {
         return;
       }
 
-      updatePreviewImage();
+      updateThumbnail();
     });
 
     watch(
@@ -101,8 +102,8 @@ export default defineComponent({
           return;
         }
 
-        updatePreviewImage();
-      }, config.preview.delay),
+        updateThumbnail();
+      }, config.thumbnail.delay),
     );
 
     const handleTab = (event: KeyboardEvent) => {

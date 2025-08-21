@@ -11,9 +11,6 @@ export type PrismData = {
 };
 
 export type SlideData = {
-  id: string;
-  color: string;
-  fileName: string;
   code: string;
-  preview: string;
+  thumbnail: string;
 };

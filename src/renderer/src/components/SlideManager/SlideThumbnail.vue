@@ -2,14 +2,14 @@
   <div class="relative" @click.prevent="emit('select', index)">
     <img
       class="w-full rounded-xl h-preview-slide"
-      :src="preview"
+      :src="thumbnail"
       alt="Preview"
-      v-if="preview"
+      v-if="thumbnail"
     />
     <div
       v-else
       :style="{
-        backgroundColor: config.preview.backgroundColor(theme),
+        backgroundColor: config.thumbnail.backgroundColor(theme),
       }"
       class="rounded-xl h-preview-slide"
     ></div>
@@ -85,7 +85,7 @@ const { config } = window;
 const { theme } = useTheme();
 
 defineProps<{
-  preview?: string;
+  thumbnail?: string;
   index: number;
 }>();
 

@@ -11,6 +11,7 @@
             class="absolute z-10 inset-0 opacity-0"
             :value="color"
             @update:model-value="(c: string) => $emit('update:color', c)"
+            :disabled="isPreview"
           />
           <span
             class="pi pi-code absolute inset-0"
@@ -24,6 +25,7 @@
         :value="fileName"
         @input="updateFileName"
         :style="{ width: `${fileNameInputSize}ch` }"
+        :disabled="isPreview"
       />
       <div class="w-1/3 flex space-x-3 justify-end mr-4">
         <span class="pi pi-minus"></span>
@@ -33,12 +35,12 @@
     </header>
 
     <article
-      ref="preview"
-      class="flex space-x-3 min-h-[30rem] relative w-full h-full p-4 font-mono!"
+      ref="thumbnail"
+      class="flex space-x-3 relative w-full h-full p-4 font-mono!"
     >
       <prime-textarea
         spellcheck="false"
-        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full z-10 caret-black dark:caret-white code-font h-full"
+        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full min-h-[30rem] z-10 caret-black dark:caret-white code-font"
         :value="code"
         @input="$emit('update:code', $event.target.value)"
         @keydown="handleTab"

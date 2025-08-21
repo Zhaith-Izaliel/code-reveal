@@ -4,7 +4,7 @@ import Prism from "prismjs";
 import { useToast } from "primevue/usetoast";
 import { Button } from "primevue";
 import Slide from "../Slide/Slide.vue";
-import SlidePreview from "./SlidePreview.vue";
+import SlideThumbnail from "./SlideThumbnail.vue";
 import SlideManagerTools from "./SlideManagerTools.vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { Mode } from "@renderer/types";
@@ -122,16 +122,19 @@ export default defineComponent({
   components: {
     Slide,
     draggable: VueDraggableNext,
-    SlidePreview,
+    SlideThumbnail,
     PrimeButton: Button,
     SlideManagerTools,
   },
 
   setup() {
-    const language = {
+    const language = ref({
       name: "javascript",
       grammar: Prism.languages.javascript,
-    };
+    });
+
+    const color = ref("2B7FFF");
+    const fileName = ref("code.js");
 
     const slidesHook = useSlides();
 
@@ -153,6 +156,8 @@ export default defineComponent({
     return {
       ...slidesHook,
       language,
+      color,
+      fileName,
       mode,
       togglePreview,
       isPreview,

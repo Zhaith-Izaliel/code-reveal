@@ -13,7 +13,7 @@
         severity="secondary"
         icon="pi pi-chevron-left"
         rounded
-        v-tooltip.bottom="'Prev slide'"
+        v-tooltip.bottom="'Previous slide'"
         raised
         @click.prevent="() => emit('prevSlide')"
       />
