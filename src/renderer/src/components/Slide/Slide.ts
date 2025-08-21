@@ -39,6 +39,8 @@ export default defineComponent({
 
     const previewDOMElement = useTemplateRef<HTMLElement>("thumbnail");
 
+    // const codeDOMElement = useTemplateRef<HTMLElement>("code");
+
     const updateFileName = (event: Event) => {
       emit("update:fileName", (event.target as HTMLInputElement).value);
     };

@@ -42,13 +42,14 @@
         spellcheck="false"
         class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full min-h-[30rem] z-10 caret-black dark:caret-white code-font"
         :value="code"
+        :disabled="isPreview"
         @input="$emit('update:code', $event.target.value)"
         @keydown="handleTab"
         autoResize
       />
       <section class="absolute inset-0 w-full h-full">
         <!--prettier-ignore-->
-        <pre :class="`relative language-${language.name}`"><code v-html="highlightedCode"></code></pre>
+        <pre ref="code" :class="`relative language-${language.name}`"><code v-html="highlightedCode"></code></pre>
       </section>
     </article>
   </section>
