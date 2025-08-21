@@ -2,7 +2,7 @@
   <main class="flex h-full w-full">
     <aside
       :class="[
-        `min-h-screen h-full w-3/8 xl:w-1/6 bg-zinc-100/80 dark:bg-zinc-800/80 backdrop-blur-lg p-4 flex flex-col`,
+        `min-h-screen h-full w-3/8 xl:w-1/6 bg-surface-100/80 dark:bg-surface-800/80 backdrop-blur-lg p-4 flex flex-col`,
         {
           'opacity-20 pointer-events-none': isPreview,
         },
@@ -17,8 +17,8 @@
           :class="[
             `p-0 border rounded-xl w-full cursor-pointer shadow shadow-black/30 dark:shadow-black/80`,
             {
-              'border-zinc-300 dark:border-zinc-800': selectedIndex !== i,
-              'border-blue-500 border-2': selectedIndex === i,
+              'border-surface-300 dark:border-surface-800': selectedIndex !== i,
+              'border-primary-500 border-2': selectedIndex === i,
             },
           ]"
         >
@@ -71,6 +71,7 @@
         :is-preview="isPreview"
         :generate-thumbnail="!isPreview"
         :language="language"
+        :slides-to-animate="slides"
         class="xl:w-2/5 m-auto mt-8"
       />
     </section>

@@ -133,7 +133,7 @@ export default defineComponent({
       grammar: Prism.languages.javascript,
     });
 
-    const color = ref("2B7FFF");
+    const color = ref("6366F1");
     const fileName = ref("code.js");
 
     const slidesHook = useSlides();

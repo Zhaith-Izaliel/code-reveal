@@ -14,13 +14,12 @@
       class="rounded-xl h-preview-slide"
     ></div>
     <header
-      class="absolute w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-zinc-800 dark:text-zinc-400 text-xs"
+      class="absolute w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-surface-800 dark:text-surface-400 text-xs"
     >
       <prime-button
         icon="pi pi-chevron-down"
         variant="text"
         severity="secondary"
-        raised
         class="h-6"
         v-tooltip.bottom="'Move down'"
         @click.prevent="
@@ -33,7 +32,6 @@
         icon="pi pi-chevron-up"
         variant="text"
         severity="secondary"
-        raised
         class="h-6"
         v-tooltip.bottom="'Move up'"
         @click.prevent="
@@ -46,7 +44,6 @@
         icon="pi pi-clone"
         variant="text"
         severity="secondary"
-        raised
         class="h-6"
         v-tooltip.bottom="'Duplicate'"
         @click.prevent="
@@ -59,7 +56,6 @@
         icon="pi pi-trash"
         variant="text"
         severity="secondary"
-        raised
         class="h-6"
         v-tooltip.bottom="'Delete'"
         @click.prevent="

@@ -4,7 +4,8 @@
       :class="[
         `flex items-center justify-center space-x-3`,
         {
-          'pr-6 mr-6 border-r border-zinc-400 dark:border-zinc-600': !isPreview,
+          'pr-6 mr-6 border-r border-surface-400 dark:border-surface-600':
+            !isPreview,
         },
       ]"
     >
@@ -17,9 +18,9 @@
         raised
         @click.prevent="() => emit('prevSlide')"
       />
+      <!-- Same button -->
       <split-button
         v-if="!isPreview"
-        severity="secondary"
         label="Preview"
         icon="pi pi-eye"
         :model="previewMenuItems"
@@ -29,7 +30,6 @@
       />
       <split-button
         v-else
-        severity="secondary"
         label="Exit preview"
         icon="pi pi-eye-slash"
         :model="previewMenuItems"
@@ -39,7 +39,7 @@
       />
       <prime-button
         v-if="slidesNumber === 0"
-        severity="help"
+        severity="secondary"
         :label="importButton.label"
         :icon="importButton.icon"
         raised
@@ -47,7 +47,7 @@
       />
       <split-button
         v-else
-        severity="help"
+        severity="secondary"
         label="Save"
         icon="pi pi-save"
         :model="saveMenuItems"
@@ -74,6 +74,7 @@
         raised
         rounded
         icon="pi pi-undo"
+        :disabled="slidesNumber === 0"
         @click.prevent="() => emit('undo')"
       />
       <prime-button
@@ -82,6 +83,7 @@
         raised
         rounded
         icon="pi pi-refresh"
+        :disabled="slidesNumber === 0"
         @click.prevent="() => emit('redo')"
       />
       <prime-button

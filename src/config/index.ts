@@ -1,14 +1,16 @@
 import { SlideData, Theme } from "../types";
 
+export type AppThumbnailConfig = {
+  width: number;
+  height: number;
+  skipAutoScale: boolean;
+  backgroundColor: (theme: Theme) => string;
+  cacheBust: boolean;
+  delay: number;
+};
+
 export type AppConfig = {
-  thumbnail: {
-    width: number;
-    height: number;
-    skipAutoScale: boolean;
-    backgroundColor: (theme: Theme) => string;
-    cacheBust: boolean;
-    delay: number;
-  };
+  thumbnail: AppThumbnailConfig;
 
   slides: {
     defaultSlide: SlideData;

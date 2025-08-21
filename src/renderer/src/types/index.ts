@@ -1,3 +1,5 @@
+import { DiffEntry } from "util";
+
 export enum Mode {
   Normal,
   Preview,
@@ -10,3 +12,8 @@ export enum ActionType {
 }
 
 export type Actions = Map<ActionType, () => void>;
+
+export type CodeDiff = {
+  code: DiffEntry[];
+  highlightedCode: DiffEntry[];
+};

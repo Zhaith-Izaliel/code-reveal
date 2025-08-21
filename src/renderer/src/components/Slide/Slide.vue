@@ -1,9 +1,9 @@
 <template>
   <section
-    class="border-2 border-zinc-300 dark:border-zinc-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 backdrop-blur-lg flex flex-col"
+    class="border-2 border-surface-300 dark:border-surface-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 backdrop-blur-lg flex flex-col"
   >
     <header
-      class="flex justify-between w-full h-12 space-x-4 items-center text-zinc-600 dark:text-zinc-400"
+      class="flex justify-between w-full h-12 space-x-4 items-center text-surface-600 dark:text-surface-400"
     >
       <div class="w-1/3 flex ml-4">
         <div class="overflow-hidden relative flex items-center justify-start">
@@ -32,6 +32,9 @@
         <span class="pi pi-stop"></span>
         <span class="pi pi-times"></span>
       </div>
+      <button type="button" @click.prevent="testGenerateAnimation">
+        Test generate animation
+      </button>
     </header>
 
     <article
