@@ -40,7 +40,7 @@
     >
       <prime-textarea
         spellcheck="false"
-        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full min-h-[30rem] z-10 caret-black dark:caret-white code-font"
+        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full min-h-[30rem] z-10 caret-black dark:caret-white"
         :value="code"
         :disabled="isPreview"
         @input="$emit('update:code', $event.target.value)"

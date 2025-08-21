@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: code-reveal
 productName: code-reveal
 electronVersion: 37.2.6
 directories:
@@ -34,7 +34,7 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: Zhaith-Izaliel
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
