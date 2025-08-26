@@ -17,7 +17,7 @@
       class="h-preview-slide rounded-xl"
     ></div>
     <header
-      class="absolute w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-surface-800 dark:text-surface-400 text-xs"
+      class="absolute w-1/2 xl:w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-surface-800 dark:text-surface-400 text-xs"
     >
       <prime-button
         icon="pi pi-chevron-down"

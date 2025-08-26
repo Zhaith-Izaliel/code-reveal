@@ -1,10 +1,14 @@
 import { SlideData, Theme } from "@/types";
-import { computed } from "vue";
-import { setTheme as utilsSetTheme } from "@renderer/utils";
+import { computed, reactive, ref } from "vue";
+import {
+  setTheme as utilsSetTheme,
+  generateHighlightedCode,
+} from "@renderer/utils";
 import { AnimationPrimitives, CodeDiff } from "@renderer/types";
 import Prism from "prismjs";
 import diff from "fast-diff";
 import ShortUniqueId from "short-unique-id";
+import { useToast } from "primevue";
 
 // ---- Theme ----
 
@@ -30,20 +34,80 @@ export function useTheme() {
 
 // ---- Highlight Code ----
 
-const generateHighlightedCode = (
-  code: string,
-  language: string,
-  grammar: Prism.Grammar,
-): string => {
-  if (code === "") {
-    return "";
-  }
-
-  return Prism.highlight(code, grammar, language);
-};
-
 export function useHighlightCode() {
   return { generateHighlightedCode };
+}
+
+// ---- Slides ----
+
+export function useSlides() {
+  const { config } = window;
+  const toast = useToast();
+
+  const slides = reactive<SlideData[]>([{ ...config.slides.defaultSlide }]);
+  const selectedIndex = ref(0);
+
+  const clearSlides = () => {
+    slides.splice(0, slides.length);
+    toast.add({
+      severity: "success",
+      summary: "Slides cleared",
+      detail: "All of the slides have been deleted.",
+      life: 6000,
+    });
+  };
+
+  const duplicateSlide = (index: number) => {
+    const slide = slides[index];
+    slides.push(Object.assign({}, slide));
+  };
+
+  const deleteSlide = (index: number) => {
+    if (index === selectedIndex.value) {
+      selectSlide(index - 1);
+    }
+    slides.splice(index, 1);
+  };
+
+  const createSlide = () => {
+    const { defaultSlide } = config.slides;
+    slides.push({
+      ...defaultSlide,
+    });
+  };
+
+  const selectSlide = (i: number, circleAround = false) => {
+    const index = circleAround
+      ? Math.abs(i % slides.length)
+      : Math.min(Math.max(0, i), slides.length - 1);
+
+    selectedIndex.value = index;
+  };
+
+  const swapSlides = (left: number, right: number) => {
+    const sanitizedLeft = Math.min(Math.max(0, left), slides.length - 1);
+    const sanitizedRight = Math.min(Math.max(0, right), slides.length - 1);
+
+    if (sanitizedLeft === sanitizedRight) {
+      return;
+    }
+
+    [slides[sanitizedLeft], slides[sanitizedRight]] = [
+      slides[sanitizedRight],
+      slides[sanitizedLeft],
+    ];
+  };
+
+  return {
+    slides,
+    selectedIndex,
+    clearSlides,
+    duplicateSlide,
+    deleteSlide,
+    createSlide,
+    selectSlide,
+    swapSlides,
+  };
 }
 
 // ---- Generate Animation ----

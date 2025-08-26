@@ -30,13 +30,13 @@
       "
       class="flex space-x-3 relative w-full h-full p-4 font-mono min-h-[30rem]"
       :style="{
-        height: `${codeAreaSize}px`,
+        height: `${codeAreaSize + 20}px`,
       }"
     >
-      <slot name="textarea"> </slot>
+      <slot name="textarea"></slot>
       <section class="absolute inset-0 w-full h-full">
         <!--prettier-ignore-->
-        <pre :class="`relative h-full language-${language}`"><code class="absolute top-[1rem]"><slot></slot></code></pre>
+        <pre :class="`relative h-full language-${language}`"><code class="absolute"><slot></slot></code></pre>
       </section>
     </article>
   </section>

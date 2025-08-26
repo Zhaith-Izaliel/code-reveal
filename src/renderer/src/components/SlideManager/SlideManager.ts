@@ -1,13 +1,15 @@
-import { computed, defineComponent, reactive, ref } from "vue";
-import { SlideData } from "@/types";
+import { computed, defineComponent, ref } from "vue";
+
 import Prism from "prismjs";
-import { useToast } from "primevue/usetoast";
+import { Mode } from "@renderer/types";
+
+import { useSlides } from "@renderer/hooks";
+
 import { Button, Dialog } from "primevue";
 import Slide from "../Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
-import { Mode } from "@renderer/types";
 
 // function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
 //   if (mode === Mode.Preview) {
@@ -48,76 +50,6 @@ import { Mode } from "@renderer/types";
 //
 // const actions = createActions();
 
-function useSlides() {
-  const { config } = window;
-  const toast = useToast();
-
-  const slides = reactive<SlideData[]>([{ ...config.slides.defaultSlide }]);
-  const selectedIndex = ref(0);
-
-  const clearSlides = () => {
-    slides.splice(0, slides.length);
-    toast.add({
-      severity: "success",
-      summary: "Slides cleared",
-      detail: "All of the slides have been deleted.",
-      life: 6000,
-    });
-  };
-
-  const duplicateSlide = (index: number) => {
-    const slide = slides[index];
-    slides.push(Object.assign({}, slide));
-  };
-
-  const deleteSlide = (index: number) => {
-    if (index === selectedIndex.value) {
-      selectSlide(index - 1);
-    }
-    slides.splice(index, 1);
-  };
-
-  const createSlide = () => {
-    const { defaultSlide } = config.slides;
-    slides.push({
-      ...defaultSlide,
-    });
-  };
-
-  const selectSlide = (i: number, circleAround = false) => {
-    const index = circleAround
-      ? Math.abs(i % slides.length)
-      : Math.min(Math.max(0, i), slides.length - 1);
-
-    selectedIndex.value = index;
-  };
-
-  const swapSlides = (left: number, right: number) => {
-    const sanitizedLeft = Math.min(Math.max(0, left), slides.length - 1);
-    const sanitizedRight = Math.min(Math.max(0, right), slides.length - 1);
-
-    if (sanitizedLeft === sanitizedRight) {
-      return;
-    }
-
-    [slides[sanitizedLeft], slides[sanitizedRight]] = [
-      slides[sanitizedRight],
-      slides[sanitizedLeft],
-    ];
-  };
-
-  return {
-    slides,
-    selectedIndex,
-    clearSlides,
-    duplicateSlide,
-    deleteSlide,
-    createSlide,
-    selectSlide,
-    swapSlides,
-  };
-}
-
 export default defineComponent({
   components: {
     Slide,
@@ -136,6 +68,7 @@ export default defineComponent({
 
     const color = ref("6366F1");
     const fileName = ref("code.js");
+    const codeAreaSize = ref(1);
     const changeLanguageModalVisible = ref(false);
 
     const slidesHook = useSlides();
@@ -160,6 +93,7 @@ export default defineComponent({
       language,
       color,
       fileName,
+      codeAreaSize,
       mode,
       togglePreview,
       changeLanguageModalVisible,

@@ -1,4 +1,4 @@
-import { defineComponent, computed, PropType, ref } from "vue";
+import { defineComponent, computed, PropType } from "vue";
 
 import { AppThumbnailConfig } from "@/types";
 import { PrismData } from "@/types";
@@ -38,7 +38,13 @@ export default defineComponent({
     CodeWindow,
   },
 
-  emits: ["update:code", "update:color", "update:fileName", "update:thumbnail"],
+  emits: [
+    "update:code",
+    "update:color",
+    "update:fileName",
+    "update:thumbnail",
+    "update:codeAreaSize",
+  ],
 
   props: {
     language: { type: Object as PropType<PrismData>, required: true },
@@ -46,13 +52,12 @@ export default defineComponent({
     color: { type: String, required: true },
     fileName: { type: String, required: true },
     thumbnail: { type: String, required: true },
+    codeAreaSize: { type: Number, required: true },
   },
 
   setup(props, { emit }) {
     const { config } = window;
     const { generateHighlightedCode } = useHighlightCode();
-
-    const textAreaSize = ref(1);
 
     const updateFileName = (event: Event) => {
       emit("update:fileName", (event.target as HTMLInputElement).value);
@@ -65,7 +70,7 @@ export default defineComponent({
       }
 
       emit("update:code", el.value);
-      textAreaSize.value = el.scrollHeight;
+      emit("update:codeAreaSize", el.scrollHeight);
     };
 
     const highlightedCode = computed((): string =>
@@ -110,7 +115,6 @@ export default defineComponent({
       updateFileName,
       updateThumbnail,
       updateCode,
-      textAreaSize,
       handleTab,
     };
   },
