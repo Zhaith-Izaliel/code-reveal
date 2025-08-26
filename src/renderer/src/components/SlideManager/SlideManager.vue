@@ -59,7 +59,7 @@
       </footer>
     </aside>
     <section class="w-full h-full px-12">
-      <slide-manager-tools
+      <toolbar
         :slides-number="slides.length"
         :is-preview="isPreview"
         @clear="clearSlides"
@@ -73,15 +73,16 @@
           }
         "
       />
-      <slide
-        v-if="slides[selectedIndex]"
-        v-model:code="slides[selectedIndex].code"
-        v-model:file-name="fileName"
-        v-model:color="color"
-        v-model:thumbnail="slides[selectedIndex].thumbnail"
-        :language="language"
-        class="xl:w-2/5 m-auto mt-8"
-      />
+      <template v-if="slides[selectedIndex]">
+        <slide
+          v-model:code="slides[selectedIndex].code"
+          v-model:file-name="fileName"
+          v-model:color="color"
+          v-model:thumbnail="slides[selectedIndex].thumbnail"
+          :language="language"
+          class="xl:w-2/5 m-auto mt-8"
+        />
+      </template>
     </section>
   </main>
 </template>

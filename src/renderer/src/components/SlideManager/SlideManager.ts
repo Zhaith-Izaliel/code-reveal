@@ -4,8 +4,8 @@ import Prism from "prismjs";
 import { useToast } from "primevue/usetoast";
 import { Button, Dialog } from "primevue";
 import Slide from "../Slide/Slide.vue";
-import SlideThumbnail from "./SlideThumbnail.vue";
-import SlideManagerTools from "./SlideManagerTools.vue";
+import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
+import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { Mode } from "@renderer/types";
 
@@ -124,7 +124,7 @@ export default defineComponent({
     draggable: VueDraggableNext,
     SlideThumbnail,
     PrimeButton: Button,
-    SlideManagerTools,
+    Toolbar,
     PrimeDialog: Dialog,
   },
 
