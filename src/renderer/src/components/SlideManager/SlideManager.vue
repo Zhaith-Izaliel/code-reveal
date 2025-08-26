@@ -1,4 +1,10 @@
 <template>
+  <prime-dialog
+    v-model:visible="changeLanguageModalVisible"
+    modal
+    header="Change language"
+    class="w-[25rem]"
+  ></prime-dialog>
   <main class="flex h-full w-full">
     <aside
       :class="[
@@ -61,6 +67,11 @@
         @end-preview="togglePreview(false)"
         @next-slide="selectSlide(selectedIndex + 1, true)"
         @prev-slide="selectSlide(selectedIndex - 1, true)"
+        @change-language="
+          () => {
+            changeLanguageModalVisible = true;
+          }
+        "
       />
       <slide
         v-if="slides[selectedIndex]"
@@ -68,10 +79,7 @@
         v-model:file-name="fileName"
         v-model:color="color"
         v-model:thumbnail="slides[selectedIndex].thumbnail"
-        :is-preview="isPreview"
-        :generate-thumbnail="!isPreview"
         :language="language"
-        :slides-to-animate="slides"
         class="xl:w-2/5 m-auto mt-8"
       />
     </section>

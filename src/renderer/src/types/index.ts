@@ -17,3 +17,18 @@ export type CodeDiff = {
   code: DiffEntry[];
   highlightedCode: DiffEntry[];
 };
+
+export type AnimationPrimitives = {
+  el: string;
+  id: string;
+  from: {
+    top: number;
+    right: number;
+    opacity: number;
+  };
+  to: {
+    top: number;
+    right: number;
+    opacity: number;
+  };
+};

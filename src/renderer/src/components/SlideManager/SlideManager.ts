@@ -2,7 +2,7 @@ import { computed, defineComponent, reactive, ref } from "vue";
 import { SlideData } from "@/types";
 import Prism from "prismjs";
 import { useToast } from "primevue/usetoast";
-import { Button } from "primevue";
+import { Button, Dialog } from "primevue";
 import Slide from "../Slide/Slide.vue";
 import SlideThumbnail from "./SlideThumbnail.vue";
 import SlideManagerTools from "./SlideManagerTools.vue";
@@ -125,6 +125,7 @@ export default defineComponent({
     SlideThumbnail,
     PrimeButton: Button,
     SlideManagerTools,
+    PrimeDialog: Dialog,
   },
 
   setup() {
@@ -135,6 +136,7 @@ export default defineComponent({
 
     const color = ref("6366F1");
     const fileName = ref("code.js");
+    const changeLanguageModalVisible = ref(false);
 
     const slidesHook = useSlides();
 
@@ -160,6 +162,7 @@ export default defineComponent({
       fileName,
       mode,
       togglePreview,
+      changeLanguageModalVisible,
       isPreview,
     };
   },

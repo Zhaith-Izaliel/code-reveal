@@ -1,61 +1,39 @@
 <template>
-  <section
-    class="border-2 border-surface-300 dark:border-surface-800 rounded-lg shadow-2xl mx-auto bg-white/80 dark:bg-black/80 backdrop-blur-lg flex flex-col"
-  >
-    <header
-      class="flex justify-between w-full h-12 space-x-4 items-center text-surface-600 dark:text-surface-400"
+  <div>
+    <code-window
+      :code-area-size="textAreaSize"
+      :color="color"
+      :language="language.name"
+      @thumbnail-changed="updateThumbnail"
     >
-      <div class="w-1/3 flex ml-4">
-        <div class="overflow-hidden relative flex items-center justify-start">
-          <color-picker
-            class="absolute z-10 inset-0 opacity-0"
-            :value="color"
-            @update:model-value="(c: string) => $emit('update:color', c)"
-            :disabled="isPreview"
-          />
-          <span
-            class="pi pi-code absolute inset-0"
-            :style="{ color: `#${color}` }"
-          ></span>
-        </div>
-      </div>
-      <input
-        type="text"
-        class="w-1/3 bg-transparent text-center border-none outline-none font-medium text-xs min-w-[7ch] max-w-[50ch]"
-        :value="fileName"
-        @input="updateFileName"
-        :style="{ width: `${fileNameInputSize}ch` }"
-        :disabled="isPreview"
-      />
-      <div class="w-1/3 flex space-x-3 justify-end mr-4">
-        <span class="pi pi-minus"></span>
-        <span class="pi pi-stop"></span>
-        <span class="pi pi-times"></span>
-      </div>
-      <button type="button" @click.prevent="testGenerateAnimation">
-        Test generate animation
-      </button>
-    </header>
-
-    <article
-      ref="thumbnail"
-      class="flex space-x-3 relative w-full h-full p-4 font-mono!"
-    >
-      <prime-textarea
-        spellcheck="false"
-        class="mt-[0.5rem] relative p-0! overflow-hidden whitespace-nowrap border-none! text-transparent! outline-none! shadow-none! resize-none bg-transparent! w-full min-h-[30rem] z-10 caret-black dark:caret-white"
-        :value="code"
-        :disabled="isPreview"
-        @input="$emit('update:code', $event.target.value)"
-        @keydown="handleTab"
-        autoResize
-      />
-      <section class="absolute inset-0 w-full h-full">
-        <!--prettier-ignore-->
-        <pre ref="code" :class="`relative language-${language.name}`"><code v-html="highlightedCode"></code></pre>
-      </section>
-    </article>
-  </section>
+      <template #color-picker>
+        <color-picker
+          class="absolute z-10 inset-0 opacity-0"
+          :value="color"
+          @update:model-value="(c: string) => $emit('update:color', c)"
+        />
+      </template>
+      <template #file-name>
+        <input
+          type="text"
+          class="file-name"
+          :value="fileName"
+          @input="updateFileName"
+          :style="{ width: `${fileNameInputSize}ch` }"
+        />
+      </template>
+      <template #textarea>
+        <textarea
+          spellcheck="false"
+          class="mt-[0.5rem] relative p-0 overflow-hidden whitespace-nowrap border-none text-transparent outline-none resize-none bg-transparent w-full min-h-full z-10 caret-black dark:caret-white"
+          :value="code"
+          @input="updateCode"
+          @keydown="handleTab"
+        />
+      </template>
+      <template #default><span v-html="highlightedCode"></span></template>
+    </code-window>
+  </div>
 </template>
 
 <script lang="ts" src="./Slide.ts"></script>

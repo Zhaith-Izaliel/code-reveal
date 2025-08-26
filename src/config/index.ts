@@ -1,25 +1,4 @@
-import { SlideData, Theme } from "../types";
-
-export type AppThumbnailConfig = {
-  width: number;
-  height: number;
-  skipAutoScale: boolean;
-  backgroundColor: (theme: Theme) => string;
-  cacheBust: boolean;
-  delay: number;
-};
-
-export type AppConfig = {
-  thumbnail: AppThumbnailConfig;
-
-  slides: {
-    defaultSlide: SlideData;
-    indent: {
-      number: number;
-      character: " " | "\t";
-    };
-  };
-};
+import { Theme, AppConfig } from "../types";
 
 export const config: AppConfig = {
   slides: {

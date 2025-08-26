@@ -1,7 +1,10 @@
 <template>
-  <div class="relative" @click.prevent="emit('select', index)">
+  <div
+    class="relative bg-white/80 dark:bg-black/80 rounded-xl"
+    @click.prevent="emit('select', index)"
+  >
     <img
-      class="w-full rounded-xl h-preview-slide"
+      class="w-full h-preview-slide"
       :src="thumbnail"
       alt="Preview"
       v-if="thumbnail"
@@ -11,7 +14,7 @@
       :style="{
         backgroundColor: config.thumbnail.backgroundColor(theme),
       }"
-      class="rounded-xl h-preview-slide"
+      class="h-preview-slide"
     ></div>
     <header
       class="absolute w-2/5 top-0 right-0 p-2 flex justify-end space-x-2 text-surface-800 dark:text-surface-400 text-xs"
