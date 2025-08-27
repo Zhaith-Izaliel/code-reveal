@@ -34,4 +34,16 @@ export type AppConfig = {
       character: " " | "\t";
     };
   };
+  animations: {
+    reveal: {
+      move: {
+        duration: number;
+        ease: string;
+      };
+      fade: {
+        duration: number;
+        ease: string;
+      };
+    };
+  };
 };

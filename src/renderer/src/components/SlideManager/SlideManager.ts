@@ -6,8 +6,9 @@ import { Mode } from "@renderer/types";
 import { useSlides } from "@renderer/hooks";
 
 import { Button, Dialog } from "primevue";
-import Slide from "../Slide/Slide.vue";
+import Slide from "@renderer/components/Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
+import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
 
@@ -53,6 +54,7 @@ import { VueDraggableNext } from "vue-draggable-next";
 export default defineComponent({
   components: {
     Slide,
+    SlidePreview,
     draggable: VueDraggableNext,
     SlideThumbnail,
     PrimeButton: Button,

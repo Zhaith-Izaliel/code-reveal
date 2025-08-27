@@ -1,3 +1,4 @@
+import { INSERT, EQUAL, DELETE } from "fast-diff";
 import { DiffEntry } from "util";
 
 export enum Mode {
@@ -21,14 +22,13 @@ export type CodeDiff = {
 export type AnimationPrimitives = {
   el: string;
   id: string;
-  from: {
+  op: typeof INSERT | typeof EQUAL | typeof DELETE;
+
+  top: number;
+  left: number;
+
+  to?: {
     top: number;
-    right: number;
-    opacity: number;
-  };
-  to: {
-    top: number;
-    right: number;
-    opacity: number;
+    left: number;
   };
 };

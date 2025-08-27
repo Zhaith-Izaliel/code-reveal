@@ -8,7 +8,7 @@
   <main class="flex h-full w-full">
     <aside
       :class="[
-        `min-h-screen h-full w-1/3 xl:w-1/5 bg-surface-100/80 dark:bg-surface-800/80 backdrop-blur-lg p-4 flex flex-col`,
+        `min-h-screen h-full w-2/7 xl:w-1/7 bg-surface-100/80 dark:bg-surface-800/80 backdrop-blur-lg p-4 flex flex-col`,
         {
           'opacity-20 pointer-events-none': isPreview,
         },
@@ -57,7 +57,7 @@
         />
       </footer>
     </aside>
-    <section class="w-2/3 xl:w-4/5 h-full px-6 xl:px-12">
+    <section class="w-5/7 xl:w-6/7 h-full px-6 xl:px-12">
       <toolbar
         :slides-number="slides.length"
         :is-preview="isPreview"
@@ -74,12 +74,23 @@
       />
       <template v-if="slides[selectedIndex]">
         <slide
+          v-if="!isPreview"
           v-model:code="slides[selectedIndex].code"
           v-model:file-name="fileName"
           v-model:color="color"
           v-model:thumbnail="slides[selectedIndex].thumbnail"
           v-model:code-area-size="codeAreaSize"
           :language="language"
+          class="w-full xl:w-1/2 m-auto mt-8"
+        />
+        <slide-preview
+          v-else
+          :language="language"
+          :color="color"
+          :file-name="fileName"
+          :code-area-size="codeAreaSize"
+          :selected-slide="selectedIndex"
+          :slides="slides"
           class="w-full xl:w-1/2 m-auto mt-8"
         />
       </template>

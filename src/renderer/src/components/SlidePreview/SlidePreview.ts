@@ -1,6 +1,10 @@
-import { defineComponent, PropType } from "vue";
+import { computed, defineComponent, onBeforeMount, PropType } from "vue";
 
 import { PrismData, SlideData } from "@/types";
+
+import { useCodeAnimation, useHighlightCode } from "@renderer/hooks";
+import { AnimationPrimitives } from "@renderer/types";
+import { createTimeline } from "animejs";
 
 import CodeWindow from "@renderer/components/CodeWindow.vue";
 
@@ -17,5 +21,49 @@ export default defineComponent({
     color: { type: String, required: true },
     codeAreaSize: { type: Number, required: true },
   },
-  setup(props) {},
+  setup(props) {
+    const { generateHighlightedCode } = useHighlightCode();
+    const { generateAnimationsPrimitives, assignTimeline } = useCodeAnimation();
+
+    let primitives: AnimationPrimitives[][] = [];
+
+    onBeforeMount(() => {
+      primitives = generateAnimationsPrimitives(
+        props.slides,
+        props.language.name,
+        props.language.grammar,
+      );
+    });
+
+    const animationId = computed(() => Math.max(0, props.selectedSlide - 1));
+    const codeToDisplay = computed(() => {
+      if (props.selectedSlide === 0) {
+        return generateHighlightedCode(
+          props.slides[0].code,
+          props.language.name,
+          props.language.grammar,
+        );
+      }
+
+      return primitives[animationId.value].reduce(
+        (acc, item) => acc + item.el,
+        "",
+      );
+    });
+
+    const generateAndPlayAnimation = () => {
+      if (props.selectedSlide === 0) {
+        return;
+      }
+
+      const timeline = createTimeline();
+      primitives[animationId.value].forEach((item) => {
+        assignTimeline(item, timeline);
+      });
+
+      timeline.play();
+    };
+
+    return { codeToDisplay, generateAndPlayAnimation };
+  },
 });

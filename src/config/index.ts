@@ -22,4 +22,16 @@ export const config: AppConfig = {
 
     delay: 200,
   },
+  animations: {
+    reveal: {
+      move: {
+        duration: 1000,
+        ease: "inOut",
+      },
+      fade: {
+        duration: 1000,
+        ease: "inOut",
+      },
+    },
+  },
 };

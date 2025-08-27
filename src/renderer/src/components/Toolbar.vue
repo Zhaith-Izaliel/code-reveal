@@ -24,7 +24,7 @@
         label="Preview"
         icon="pi pi-eye"
         :model="previewMenuItems"
-        :disabled="slidesNumber === 0"
+        :disabled="slidesNumber < 2"
         raised
         @click.prevent="() => emit('preview')"
       />
