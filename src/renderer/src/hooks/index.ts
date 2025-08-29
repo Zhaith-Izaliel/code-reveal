@@ -113,127 +113,179 @@ export function useSlides() {
 
 // ---- Generate Animation ----
 
+function generateId() {
+  const { randomUUID } = new ShortUniqueId({ length: 10 });
+  return `A-${randomUUID()}`;
+}
+
+function generateElement(id: string, content: string, style: string): string {
+  return `<span id="${id}" class="absolute" style="${style}">${content}</span>`;
+}
+
 function generateDiffs(
   slides: SlideData[],
   language: string,
   grammar: Prism.Grammar,
-): CodeDiff[] {
-  let entries: CodeDiff[] = [];
-  const highlightedCodeDiff: string[] = slides.map((item): string =>
-    generateHighlightedCode(item.code, language, grammar),
-  );
+): CodeDiff[][] {
+  let entries: CodeDiff[][] = [];
 
   for (let i = 0; i < slides.length - 1; i++) {
-    const code = diff(slides[i].code, slides[i + 1].code);
-    const highlightedCode = diff(
-      highlightedCodeDiff[i],
-      highlightedCodeDiff[i + 1],
-    );
-    entries.push({ code, highlightedCode });
+    const codeDiff = diff(slides[i].code, slides[i + 1].code);
+    const finalDiff: CodeDiff[] = [];
+
+    codeDiff.forEach((item) => {
+      const [op, code] = item;
+
+      if (code.includes("\n")) {
+        const splitCode = code.split("\n");
+        splitCode.forEach((str, index, array) => {
+          finalDiff.push({
+            code: str,
+            highlightedCode: generateHighlightedCode(str, language, grammar),
+            op,
+            isNewLine: array.length - 1 !== index,
+            lastOfSplit: array.length - 1 === index,
+          });
+        });
+        return;
+      }
+
+      finalDiff.push({
+        code,
+        highlightedCode: generateHighlightedCode(code, language, grammar),
+        op,
+        isNewLine: false,
+        lastOfSplit: false,
+      });
+    });
+
+    entries.push(finalDiff);
   }
 
   return entries;
 }
 
-function generatePrimitivesForDiff(item: CodeDiff): AnimationPrimitives[] {
-  let intermediates: AnimationPrimitives[] = [];
-  const { randomUUID } = new ShortUniqueId({ length: 10 });
-  console.log(item);
+function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
+  const primitives: AnimationPrimitives[] = [];
+  console.log(items);
 
-  let lastEqual = "";
+  // Row number
+  let top = 0;
 
-  for (let i = 0; i < item.code.length; i++) {
-    const [_, str] = item.code[i];
-    const [op, formattedStr] = item.highlightedCode[i];
-    const id = `A-${randomUUID()}`;
-    const el = (top: number, left: number, opacity = 1): string =>
-      `<span id="${id}" class="absolute" style="top: ${top}rem; left: ${left}ch; opacity: ${opacity};">${formattedStr}</span>`;
+  // Row number excluding insertions
+  let topNoInsert = 0;
 
-    if (i === 0) {
-      intermediates.push({
-        el: el(0, 0, op === INSERT ? 0 : 1),
-        id,
-        op,
-        top: 0,
-        left: 0,
-      });
+  // Row number excluding deletions
+  let topNoDelete = 0;
 
-      if (op === EQUAL) {
-        lastEqual = str;
+  // Column number
+  let left = 0;
+
+  let lastEqualOrAdd = "";
+
+  for (let i = 0; i < items.length; i++) {
+    const { op, code, highlightedCode, isNewLine, lastOfSplit } = items[i];
+
+    if (code !== "") {
+      const id = generateId();
+      const el = (top: number, left: number, opacity = 1): string =>
+        generateElement(
+          id,
+          highlightedCode,
+          `top:${top * 1.5}rem; left: ${left}ch; opacity: ${opacity}`,
+        );
+
+      if (i === 0) {
+        primitives.push({
+          el: el(top, left),
+          id,
+          op,
+        });
+      } else {
+        const {
+          op: prevOp,
+          code: prevCode,
+          lastOfSplit: prevLastOfSplit,
+          isNewLine: prevIsNewLine,
+        } = items[i - 1];
+
+        switch (op) {
+          case DELETE:
+            primitives.push({
+              el: el(top, left),
+              id,
+              op,
+              opacity: { from: 1, to: 0 },
+            });
+            break;
+
+          case INSERT:
+            const newLeft =
+              prevOp !== DELETE
+                ? isNewLine
+                  ? 0
+                  : left
+                : left - prevCode.length;
+
+            primitives.push({
+              el: el(top, newLeft, 0),
+              id,
+              op,
+              opacity: { from: 0, to: 1 },
+            });
+            break;
+
+          default:
+          case EQUAL:
+            const toLeft =
+              prevOp === DELETE
+                ? lastEqualOrAdd.length
+                : prevLastOfSplit || prevIsNewLine
+                  ? 0
+                  : Math.max(0, left - prevCode.length);
+
+            const fromTop = prevOp === INSERT ? topNoInsert : top;
+            const toTop = prevOp === DELETE ? topNoDelete : top;
+
+            primitives.push({
+              el: el(fromTop, left),
+              id,
+              op,
+              left: { from: left, to: toLeft },
+              top: { from: fromTop, to: toTop },
+            });
+            break;
+        }
       }
-      continue;
     }
 
-    const [prevOp, prevStr] = item.code[i - 1];
-    const prevSplit = prevStr.split("\n");
-    const prevLastLength = prevSplit[prevSplit.length - 1].length;
-    const prevLines = prevSplit.length - 1;
+    if (op !== DELETE) {
+      lastEqualOrAdd = code;
+    }
 
-    const { top, left } = intermediates[i - 1];
+    if (op !== INSERT) {
+      left = isNewLine || lastOfSplit ? 0 : left + code.length;
+    }
 
-    switch (op) {
-      case INSERT:
-        const currSplit = str.split("\n");
-        const newTop = prevOp === DELETE ? top - prevLines : top + prevLines;
-        const newLeft =
-          currSplit[0].length === 0
-            ? 0
-            : prevOp === DELETE
-              ? left - prevLastLength
-              : left + prevLastLength;
-        intermediates.push({
-          el: el(newTop, newLeft, 0),
-          id,
-          op,
-          top: newTop,
-          left: newLeft,
-        });
-        continue;
-      case DELETE:
-        const newTop2 = top;
-        const newLeft2 = left + prevLastLength;
-        intermediates.push({
-          el: el(newTop2, newLeft2),
-          id,
-          op,
-          top: newTop2,
-          left: newLeft2,
-        });
-        continue;
+    if (isNewLine) {
+      top++;
 
-      default:
-      case EQUAL:
-        const newTop3 = prevOp === DELETE ? top + prevLines : top;
-        const newLeft3 =
-          prevOp === DELETE
-            ? left + prevLastLength
-            : left === 0
-              ? lastEqual.length
-              : left;
-        intermediates.push({
-          el: el(newTop3, newLeft3),
-          id,
-          op,
-          top: newTop3,
-          left: newLeft3,
-          to: {
-            top: prevOp === DELETE ? top : top + prevLines,
-            left: prevOp === DELETE ? left : left + prevLastLength,
-          },
-        });
-        lastEqual = str;
-        continue;
+      if (op !== INSERT) {
+        topNoInsert++;
+      }
+      if (op !== DELETE) {
+        topNoDelete++;
+      }
     }
   }
 
-  return intermediates.map((inter) => {
-    if (inter.to) {
-      inter.to.top *= 1.5;
+  return primitives.map((prim) => {
+    if (prim.top) {
+      prim.top.to *= 1.5;
+      prim.top.from *= 1.5;
     }
 
-    inter.top *= 1.5;
-
-    return inter;
+    return prim;
   });
 }
 
@@ -252,52 +304,52 @@ const generateAnimationsPrimitives = (
 
 const assignTimeline = (primitive: AnimationPrimitives, timeline: Timeline) => {
   const { config } = window;
+
   switch (primitive.op) {
     case DELETE:
-      timeline.add(
-        `#${primitive.id}`,
-        {
-          duration: config.animations.reveal.fade.duration,
-          ease: config.animations.reveal.fade.ease,
-          opacity: {
-            from: 1,
-            to: 0,
+      if (primitive.opacity) {
+        timeline.add(
+          `#${primitive.id}`,
+          {
+            duration: config.animations.reveal.fade.duration,
+            ease: config.animations.reveal.fade.ease,
+            opacity: primitive.opacity,
           },
-        },
-        0,
-      );
+          0,
+        );
+      }
       return;
+
     case INSERT:
-      timeline.add(
-        `#${primitive.id}`,
-        {
-          duration: config.animations.reveal.fade.duration,
-          ease: config.animations.reveal.fade.ease,
-          opacity: {
-            from: 0,
-            to: 1,
+      if (primitive.opacity) {
+        timeline.add(
+          `#${primitive.id}`,
+          {
+            duration: config.animations.reveal.fade.duration,
+            ease: config.animations.reveal.fade.ease,
+            opacity: primitive.opacity,
           },
-        },
-        config.animations.reveal.move.duration +
-          config.animations.reveal.fade.duration,
-      );
+          config.animations.reveal.move.duration +
+            config.animations.reveal.fade.duration,
+        );
+      }
       return;
 
     default:
     case EQUAL:
-      if (primitive.to) {
+      if (primitive.left && primitive.top) {
         timeline.add(
           `#${primitive.id}`,
           {
             duration: config.animations.reveal.move.duration,
             ease: config.animations.reveal.move.ease,
             top: {
-              from: `${primitive.top}rem`,
-              to: `${primitive.to.top}rem`,
+              from: `${primitive.top.from}em`,
+              to: `${primitive.top.to}em`,
             },
             left: {
-              from: `${primitive.left}ch`,
-              to: `${primitive.to.left}ch`,
+              from: `${primitive.left.from}ch`,
+              to: `${primitive.left.to}ch`,
             },
           },
           config.animations.reveal.move.duration,

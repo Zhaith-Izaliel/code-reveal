@@ -1,4 +1,11 @@
-import { computed, defineComponent, onBeforeMount, PropType } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  ref,
+  watch,
+} from "vue";
 
 import { PrismData, SlideData } from "@/types";
 
@@ -27,6 +34,8 @@ export default defineComponent({
 
     let primitives: AnimationPrimitives[][] = [];
 
+    const timelineCompleted = ref(false);
+
     onBeforeMount(() => {
       primitives = generateAnimationsPrimitives(
         props.slides,
@@ -36,10 +45,11 @@ export default defineComponent({
     });
 
     const animationId = computed(() => Math.max(0, props.selectedSlide - 1));
+    const slideId = computed(() => props.selectedSlide);
     const codeToDisplay = computed(() => {
-      if (props.selectedSlide === 0) {
+      if (props.selectedSlide === 0 || timelineCompleted.value) {
         return generateHighlightedCode(
-          props.slides[0].code,
+          props.slides[props.selectedSlide].code,
           props.language.name,
           props.language.grammar,
         );
@@ -52,7 +62,7 @@ export default defineComponent({
     });
 
     const generateAndPlayAnimation = () => {
-      if (props.selectedSlide === 0) {
+      if (props.selectedSlide === 0 || timelineCompleted.value) {
         return;
       }
 
@@ -61,8 +71,18 @@ export default defineComponent({
         assignTimeline(item, timeline);
       });
 
-      timeline.play();
+      timeline.play().then(() => {
+        timelineCompleted.value = true;
+      });
     };
+
+    watch(
+      slideId,
+      () => {
+        timelineCompleted.value = false;
+      },
+      { immediate: true },
+    );
 
     return { codeToDisplay, generateAndPlayAnimation };
   },

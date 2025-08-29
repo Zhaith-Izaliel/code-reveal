@@ -1,5 +1,4 @@
 import { INSERT, EQUAL, DELETE } from "fast-diff";
-import { DiffEntry } from "util";
 
 export enum Mode {
   Normal,
@@ -15,8 +14,11 @@ export enum ActionType {
 export type Actions = Map<ActionType, () => void>;
 
 export type CodeDiff = {
-  code: DiffEntry[];
-  highlightedCode: DiffEntry[];
+  code: string;
+  highlightedCode: string;
+  op: typeof INSERT | typeof EQUAL | typeof DELETE;
+  isNewLine: boolean;
+  lastOfSplit: boolean;
 };
 
 export type AnimationPrimitives = {
@@ -24,11 +26,18 @@ export type AnimationPrimitives = {
   id: string;
   op: typeof INSERT | typeof EQUAL | typeof DELETE;
 
-  top: number;
-  left: number;
+  opacity?: {
+    from: number;
+    to: number;
+  };
 
-  to?: {
-    top: number;
-    left: number;
+  top?: {
+    from: number;
+    to: number;
+  };
+
+  left?: {
+    from: number;
+    to: number;
   };
 };
