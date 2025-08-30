@@ -10,7 +10,7 @@ import {
 import { PrismData, SlideData } from "@/types";
 
 import { useCodeAnimation, useHighlightCode } from "@renderer/hooks";
-import { AnimationPrimitives } from "@renderer/types";
+import { DiffAnimationPrimitive } from "@renderer/types";
 import { createTimeline } from "animejs";
 
 import CodeWindow from "@renderer/components/CodeWindow.vue";
@@ -32,7 +32,7 @@ export default defineComponent({
     const { generateHighlightedCode } = useHighlightCode();
     const { generateAnimationsPrimitives, assignTimeline } = useCodeAnimation();
 
-    let primitives: AnimationPrimitives[][] = [];
+    let primitives: DiffAnimationPrimitive[][] = [];
 
     const timelineCompleted = ref(false);
 

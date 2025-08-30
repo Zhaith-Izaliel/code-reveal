@@ -4,7 +4,7 @@ import {
   setTheme as utilsSetTheme,
   generateHighlightedCode,
 } from "@renderer/utils";
-import { AnimationPrimitives, CodeDiff } from "@renderer/types";
+import { DiffAnimationPrimitive, CodeDiff } from "@renderer/types";
 import Prism from "prismjs";
 import diff, { DELETE, INSERT, EQUAL } from "fast-diff";
 import ShortUniqueId from "short-unique-id";
@@ -144,7 +144,6 @@ function generateDiffs(
             highlightedCode: generateHighlightedCode(str, language, grammar),
             op,
             isNewLine: array.length - 1 !== index,
-            lastOfSplit: array.length - 1 === index,
           });
         });
         return;
@@ -155,7 +154,6 @@ function generateDiffs(
         highlightedCode: generateHighlightedCode(code, language, grammar),
         op,
         isNewLine: false,
-        lastOfSplit: false,
       });
     });
 
@@ -165,26 +163,26 @@ function generateDiffs(
   return entries;
 }
 
-function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
-  const primitives: AnimationPrimitives[] = [];
+function generatePrimitivesForDiff(
+  items: CodeDiff[],
+): DiffAnimationPrimitive[] {
+  const primitives: DiffAnimationPrimitive[] = [];
   console.log(items);
 
-  // Row number
-  let top = 0;
+  // Row number before operations
+  let fromTop = 0;
 
-  // Row number excluding insertions
-  let topNoInsert = 0;
+  // Row number after operations
+  let toTop = 0;
 
-  // Row number excluding deletions
-  let topNoDelete = 0;
+  // Column number after operations
+  let toLeft = 0;
 
-  // Column number
-  let left = 0;
-
-  let lastEqualOrAdd = "";
+  // Column number before operations
+  let fromLeft = 0;
 
   for (let i = 0; i < items.length; i++) {
-    const { op, code, highlightedCode, isNewLine, lastOfSplit } = items[i];
+    const { op, code, highlightedCode, isNewLine } = items[i];
 
     if (code !== "") {
       const id = generateId();
@@ -197,22 +195,15 @@ function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
 
       if (i === 0) {
         primitives.push({
-          el: el(top, left),
+          el: el(toTop, toLeft),
           id,
           op,
         });
       } else {
-        const {
-          op: prevOp,
-          code: prevCode,
-          lastOfSplit: prevLastOfSplit,
-          isNewLine: prevIsNewLine,
-        } = items[i - 1];
-
         switch (op) {
           case DELETE:
             primitives.push({
-              el: el(top, left),
+              el: el(fromTop, fromLeft),
               id,
               op,
               opacity: { from: 1, to: 0 },
@@ -220,15 +211,8 @@ function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
             break;
 
           case INSERT:
-            const newLeft =
-              prevOp !== DELETE
-                ? isNewLine
-                  ? 0
-                  : left
-                : left - prevCode.length;
-
             primitives.push({
-              el: el(top, newLeft, 0),
+              el: el(toTop, toLeft, 0),
               id,
               op,
               opacity: { from: 0, to: 1 },
@@ -237,21 +221,11 @@ function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
 
           default:
           case EQUAL:
-            const toLeft =
-              prevOp === DELETE
-                ? lastEqualOrAdd.length
-                : prevLastOfSplit || prevIsNewLine
-                  ? 0
-                  : Math.max(0, left - prevCode.length);
-
-            const fromTop = prevOp === INSERT ? topNoInsert : top;
-            const toTop = prevOp === DELETE ? topNoDelete : top;
-
             primitives.push({
-              el: el(fromTop, left),
+              el: el(fromTop, fromLeft),
               id,
               op,
-              left: { from: left, to: toLeft },
+              left: { from: fromLeft, to: toLeft },
               top: { from: fromTop, to: toTop },
             });
             break;
@@ -260,21 +234,19 @@ function generatePrimitivesForDiff(items: CodeDiff[]): AnimationPrimitives[] {
     }
 
     if (op !== DELETE) {
-      lastEqualOrAdd = code;
+      toLeft = isNewLine ? 0 : toLeft + code.length;
     }
 
     if (op !== INSERT) {
-      left = isNewLine || lastOfSplit ? 0 : left + code.length;
+      fromLeft = isNewLine ? 0 : fromLeft + code.length;
     }
 
     if (isNewLine) {
-      top++;
-
       if (op !== INSERT) {
-        topNoInsert++;
+        fromTop++;
       }
       if (op !== DELETE) {
-        topNoDelete++;
+        toTop++;
       }
     }
   }
@@ -293,7 +265,7 @@ const generateAnimationsPrimitives = (
   slides: SlideData[],
   language: string,
   grammar: Prism.Grammar,
-): AnimationPrimitives[][] => {
+): DiffAnimationPrimitive[][] => {
   if (slides.length <= 1 || slides.every((item) => item.code === "")) {
     return [];
   }
@@ -302,7 +274,10 @@ const generateAnimationsPrimitives = (
   return diffs.map(generatePrimitivesForDiff);
 };
 
-const assignTimeline = (primitive: AnimationPrimitives, timeline: Timeline) => {
+const assignTimeline = (
+  primitive: DiffAnimationPrimitive,
+  timeline: Timeline,
+) => {
   const { config } = window;
 
   switch (primitive.op) {

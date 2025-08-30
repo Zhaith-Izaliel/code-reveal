@@ -18,10 +18,9 @@ export type CodeDiff = {
   highlightedCode: string;
   op: typeof INSERT | typeof EQUAL | typeof DELETE;
   isNewLine: boolean;
-  lastOfSplit: boolean;
 };
 
-export type AnimationPrimitives = {
+export type DiffAnimationPrimitive = {
   el: string;
   id: string;
   op: typeof INSERT | typeof EQUAL | typeof DELETE;
