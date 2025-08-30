@@ -167,7 +167,6 @@ function generatePrimitivesForDiff(
   items: CodeDiff[],
 ): DiffAnimationPrimitive[] {
   const primitives: DiffAnimationPrimitive[] = [];
-  console.log(items);
 
   // Row number before operations
   let fromTop = 0;
