@@ -95,6 +95,14 @@
         @click.prevent="() => emit('changeLanguage')"
       />
       <prime-button
+        severity="secondary"
+        v-tooltip.bottom="'Animation Settings'"
+        raised
+        rounded
+        icon="pi pi-sliders-h"
+        @click.prevent="() => emit('animationSettings')"
+      />
+      <prime-button
         severity="danger"
         v-tooltip.bottom="'Clear all slides'"
         raised
@@ -130,6 +138,7 @@ const emit = defineEmits([
   "exportVideo",
   "autoPlay",
   "changeLanguage",
+  "animationSettings",
   "nextSlide",
   "prevSlide",
 ]);

@@ -1,6 +1,6 @@
 import { defineComponent, computed, PropType } from "vue";
 
-import { AppThumbnailConfig } from "@/types";
+import { AppThumbnailConfig, Indent } from "@/types";
 import { PrismData } from "@/types";
 
 import _ from "lodash";
@@ -48,6 +48,7 @@ export default defineComponent({
 
   props: {
     language: { type: Object as PropType<PrismData>, required: true },
+    indent: { type: Object as PropType<Indent>, required: true },
     code: { type: String, required: true },
     color: { type: String, required: true },
     fileName: { type: String, required: true },
@@ -97,11 +98,10 @@ export default defineComponent({
 
         el.value =
           el.value.substring(0, start) +
-          indent(config.slides.indent.character, config.slides.indent.number) +
+          indent(props.indent.character, props.indent.number) +
           el.value.substring(end);
 
-        el.selectionStart = el.selectionEnd =
-          start + config.slides.indent.number;
+        el.selectionStart = el.selectionEnd = start + props.indent.number;
 
         el.dispatchEvent(new Event("input"));
 

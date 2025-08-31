@@ -68,7 +68,7 @@ export default defineComponent({
 
       const timeline = createTimeline();
       primitives[animationId.value].forEach((item) => {
-        assignTimeline(item, timeline);
+        assignTimeline(item, timeline, props.slides[props.selectedSlide]);
       });
 
       timeline.play().then(() => {

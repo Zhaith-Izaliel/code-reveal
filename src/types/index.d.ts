@@ -1,4 +1,5 @@
 import { NativeTheme } from "electron";
+import { EasingParam } from "animejs";
 import Prism from "prismjs";
 
 export type Theme = "dark" | "light";
@@ -10,9 +11,32 @@ export type PrismData = {
   name: string;
 };
 
+export type Indent = {
+  number: number;
+  character: " " | "\t";
+};
+
 export type SlideData = {
   code: string;
   thumbnail: string;
+  animations: {
+    move: {
+      duration: number;
+      ease: EasingParam;
+    };
+    fade: {
+      duration: number;
+      ease: EasingParam;
+    };
+  };
+};
+
+export type Save = {
+  fileName: string;
+  color: string;
+  slides: SlideData[];
+  language: PrismData;
+  indent: Indent;
 };
 
 export type AppThumbnailConfig = {
@@ -27,23 +51,11 @@ export type AppThumbnailConfig = {
 export type AppConfig = {
   thumbnail: AppThumbnailConfig;
 
-  slides: {
-    defaultSlide: SlideData;
-    indent: {
-      number: number;
-      character: " " | "\t";
-    };
-  };
-  animations: {
-    reveal: {
-      move: {
-        duration: number;
-        ease: string;
-      };
-      fade: {
-        duration: number;
-        ease: string;
-      };
-    };
+  default: {
+    slide: SlideData;
+    indent: Indent;
+    language: PrismData;
+    fileName: string;
+    color: string;
   };
 };

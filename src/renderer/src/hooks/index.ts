@@ -45,7 +45,7 @@ export function useSlides() {
   const { config } = window;
   const toast = useToast();
 
-  const slides = reactive<SlideData[]>([{ ...config.slides.defaultSlide }]);
+  const slides = reactive<SlideData[]>([{ ...config.default.slide }]);
   const selectedIndex = ref(0);
 
   const clearSlides = () => {
@@ -287,17 +287,16 @@ const generateAnimationsPrimitives = (
 const assignTimeline = (
   primitive: DiffAnimationPrimitive,
   timeline: Timeline,
+  slide: SlideData,
 ) => {
-  const { config } = window;
-
   switch (primitive.op) {
     case DELETE:
       if (primitive.opacity) {
         timeline.add(
           `#${primitive.id}`,
           {
-            duration: config.animations.reveal.fade.duration,
-            ease: config.animations.reveal.fade.ease,
+            duration: slide.animations.fade.duration,
+            ease: slide.animations.fade.ease,
             opacity: primitive.opacity,
           },
           0,
@@ -310,12 +309,11 @@ const assignTimeline = (
         timeline.add(
           `#${primitive.id}`,
           {
-            duration: config.animations.reveal.fade.duration,
-            ease: config.animations.reveal.fade.ease,
+            duration: slide.animations.fade.duration,
+            ease: slide.animations.fade.ease,
             opacity: primitive.opacity,
           },
-          config.animations.reveal.move.duration +
-            config.animations.reveal.fade.duration,
+          slide.animations.move.duration + slide.animations.fade.duration,
         );
       }
       return;
@@ -326,8 +324,8 @@ const assignTimeline = (
         timeline.add(
           `#${primitive.id}`,
           {
-            duration: config.animations.reveal.move.duration,
-            ease: config.animations.reveal.move.ease,
+            duration: slide.animations.move.duration,
+            ease: slide.animations.move.ease,
             top: {
               from: `${primitive.top.from}em`,
               to: `${primitive.top.to}em`,
@@ -337,7 +335,7 @@ const assignTimeline = (
               to: `${primitive.left.to}ch`,
             },
           },
-          config.animations.reveal.move.duration,
+          slide.animations.move.duration,
         );
       }
       return;

@@ -6,13 +6,13 @@ import prismjs from "vite-plugin-prismjs";
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin(), prismjs({ languages: "all" })],
     resolve: {
       alias: [{ find: "@", replacement: resolve(__dirname, "./src") }],
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin(), prismjs({ languages: "all" })],
     resolve: {
       alias: [{ find: "@", replacement: resolve(__dirname, "./src") }],
     },

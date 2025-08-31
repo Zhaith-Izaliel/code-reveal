@@ -5,6 +5,12 @@
     header="Change language"
     class="w-[25rem]"
   ></prime-dialog>
+  <prime-dialog
+    v-model:visible="animationSettingsModalVisible"
+    modal
+    header="Animation Settings"
+    class="w-[25rem]"
+  ></prime-dialog>
   <main class="flex h-full w-full">
     <aside
       :class="[
@@ -71,6 +77,11 @@
             changeLanguageModalVisible = true;
           }
         "
+        @animation-settings="
+          () => {
+            animationSettingsModalVisible = true;
+          }
+        "
       />
       <template v-if="slides[selectedIndex]">
         <slide
@@ -81,6 +92,7 @@
           v-model:thumbnail="slides[selectedIndex].thumbnail"
           v-model:code-area-size="codeAreaSize"
           :language="language"
+          :indent="indent"
           class="w-full xl:w-1/2 m-auto mt-8"
         />
         <slide-preview

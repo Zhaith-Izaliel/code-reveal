@@ -1,4 +1,4 @@
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, reactive, ref } from "vue";
 
 import Prism from "prismjs";
 import { Mode } from "@renderer/types";
@@ -11,6 +11,7 @@ import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
 import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
+import { Indent, PrismData, Save } from "@/types";
 
 // function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
 //   if (mode === Mode.Preview) {
@@ -63,17 +64,28 @@ export default defineComponent({
   },
 
   setup() {
-    const language = ref({
-      name: "javascript",
-      grammar: Prism.languages.javascript,
+    const { config } = window;
+    const language = ref<PrismData>({
+      name: config.default.language.name,
+      grammar: structuredClone(config.default.language.grammar),
     });
-
-    const color = ref("6366F1");
-    const fileName = ref("code.js");
+    const indent = ref<Indent>({ ...config.default.indent });
+    const color = ref<string>(config.default.color);
+    const fileName = ref<string>(config.default.fileName);
     const codeAreaSize = ref(1);
+
     const changeLanguageModalVisible = ref(false);
+    const animationSettingsModalVisible = ref(false);
 
     const slidesHook = useSlides();
+
+    const save = reactive<Save>({
+      slides: slidesHook.slides,
+      fileName: fileName.value,
+      color: color.value,
+      indent: indent.value,
+      language: language.value,
+    });
 
     // Modes
     const mode = ref(Mode.Normal);
@@ -93,11 +105,13 @@ export default defineComponent({
     return {
       ...slidesHook,
       language,
+      indent,
       color,
       fileName,
       codeAreaSize,
       mode,
       togglePreview,
+      animationSettingsModalVisible,
       changeLanguageModalVisible,
       isPreview,
     };
