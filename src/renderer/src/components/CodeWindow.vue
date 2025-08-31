@@ -6,10 +6,10 @@
       class="flex justify-between w-full h-12 space-x-4 items-center text-surface-600 dark:text-surface-400"
     >
       <div class="w-1/3 flex ml-4">
-        <div class="overflow-hidden relative flex items-center justify-start">
+        <div class="relative flex items-center justify-start">
           <slot name="color-picker"></slot>
           <span
-            class="pi pi-code absolute inset-0"
+            class="pi pi-code absolute"
             :style="{ color: `#${color}` }"
           ></span>
         </div>

@@ -45,7 +45,7 @@ export function useSlides() {
   const { config } = window;
   const toast = useToast();
 
-  const slides = reactive<SlideData[]>([{ ...config.default.slide }]);
+  const slides = reactive<SlideData[]>([]);
   const selectedIndex = ref(0);
 
   const clearSlides = () => {
@@ -71,9 +71,9 @@ export function useSlides() {
   };
 
   const createSlide = () => {
-    const { defaultSlide } = config.slides;
+    const { slide } = config.default;
     slides.push({
-      ...defaultSlide,
+      ...slide,
     });
   };
 

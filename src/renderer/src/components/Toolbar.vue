@@ -100,6 +100,7 @@
         raised
         rounded
         icon="pi pi-sliders-h"
+        :disabled="slidesNumber === 0"
         @click.prevent="() => emit('animationSettings')"
       />
       <prime-button

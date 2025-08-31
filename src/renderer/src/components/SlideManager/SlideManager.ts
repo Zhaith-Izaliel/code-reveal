@@ -112,7 +112,7 @@ export default defineComponent({
     const save = reactive<Save>({
       slides: slidesHook.slides,
       fileName: config.default.fileName,
-      color: config.default.colog,
+      color: config.default.color,
       indent: indent.value,
       language: language.value.id,
     });

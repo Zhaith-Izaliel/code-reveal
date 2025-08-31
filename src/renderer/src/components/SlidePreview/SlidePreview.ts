@@ -43,7 +43,11 @@ export default defineComponent({
     const animationId = computed(() => Math.max(0, props.selectedSlide - 1));
     const slideId = computed(() => props.selectedSlide);
     const codeToDisplay = computed(() => {
-      if (props.selectedSlide === 0 || timelineCompleted.value) {
+      if (
+        props.selectedSlide === 0 ||
+        timelineCompleted.value ||
+        primitives.length === 0
+      ) {
         return generateHighlightedCode(
           props.slides[props.selectedSlide].code,
           props.language,
@@ -57,7 +61,11 @@ export default defineComponent({
     });
 
     const generateAndPlayAnimation = () => {
-      if (props.selectedSlide === 0 || timelineCompleted.value) {
+      if (
+        props.selectedSlide === 0 ||
+        timelineCompleted.value ||
+        primitives.length === 0
+      ) {
         return;
       }
 
