@@ -1,4 +1,3 @@
-import Prism from "prismjs";
 import { Theme, AppConfig } from "../types";
 
 export const config: AppConfig = {
@@ -20,10 +19,7 @@ export const config: AppConfig = {
       },
     },
 
-    language: {
-      name: "typescript",
-      grammar: Prism.languages.typescript,
-    },
+    language: "typescript",
 
     indent: {
       number: 2,

@@ -66,8 +66,8 @@ export default defineComponent({
   setup() {
     const { config } = window;
     const language = ref<PrismData>({
-      name: config.default.language.name,
-      grammar: structuredClone(config.default.language.grammar),
+      name: config.default.language,
+      grammar: Prism.languages[config.default.language],
     });
     const indent = ref<Indent>({ ...config.default.indent });
     const color = ref<string>(config.default.color);
@@ -84,7 +84,7 @@ export default defineComponent({
       fileName: fileName.value,
       color: color.value,
       indent: indent.value,
-      language: language.value,
+      language: language.value.name,
     });
 
     // Modes

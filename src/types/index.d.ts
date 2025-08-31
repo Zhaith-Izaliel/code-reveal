@@ -35,7 +35,7 @@ export type Save = {
   fileName: string;
   color: string;
   slides: SlideData[];
-  language: PrismData;
+  language: string;
   indent: Indent;
 };
 
@@ -54,7 +54,7 @@ export type AppConfig = {
   default: {
     slide: SlideData;
     indent: Indent;
-    language: PrismData;
+    language: string;
     fileName: string;
     color: string;
   };
