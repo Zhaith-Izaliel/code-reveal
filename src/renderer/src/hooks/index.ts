@@ -193,10 +193,21 @@ function generatePrimitivesForDiff(
         );
 
       if (i === 0) {
+        let opacity: { from: number; to: number } | undefined = undefined;
+        switch (op) {
+          case DELETE:
+            opacity = { from: 1, to: 0 };
+            break;
+          case INSERT:
+            opacity = { from: 0, to: 1 };
+            break;
+        }
+
         primitives.push({
           el: el(toTop, toLeft),
           id,
           op,
+          opacity,
         });
       } else {
         switch (op) {
