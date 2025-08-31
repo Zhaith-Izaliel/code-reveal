@@ -2,7 +2,7 @@
   <code-window
     :code-area-size="codeAreaSize"
     :color="color"
-    :language="language.name"
+    :language="language"
   >
     <template #file-name>
       <span class="file-name" :style="{ width: `${fileName.length}ch` }">{{

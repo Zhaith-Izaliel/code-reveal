@@ -10,7 +10,7 @@ import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import escape from "regexp.escape";
 import icon from "../../resources/icon.png?asset";
-import { LanguageSelect, Theme } from "../types";
+import { LanguageOption, Theme } from "../types";
 import languages from "../config/languages";
 import { config } from "../config";
 
@@ -97,11 +97,37 @@ ipcMain.handle(
   (): Theme => (nativeTheme.shouldUseDarkColors ? "dark" : "light"),
 );
 
-ipcMain.handle("search:languages", (_, query: string): LanguageSelect[] => {
-  const re = new RegExp(escape(query), "gi");
+ipcMain.handle("search:languages", (_, query: string): LanguageOption[] => {
+  const re = new RegExp(escape(query), "i");
   return languages
     .filter(
       (item) => item.id.match(re) !== null || item.label.match(re) !== null,
     )
+    .sort((a, b) => {
+      const matchAId = a.id.match(re);
+      const matchALabel = a.label.match(re);
+      const matchBId = b.id.match(re);
+      const matchBLabel = b.label.match(re);
+
+      const aIdLength = matchAId !== null ? matchAId[0].length : 0;
+      const aLabelLength = matchALabel !== null ? matchALabel[0].length : 0;
+      const bIdLength = matchBId !== null ? matchBId[0].length : 0;
+      const bLabelLength = matchBLabel !== null ? matchBLabel[0].length : 0;
+
+      const scoreA =
+        (aIdLength / a.id.length + aLabelLength / a.label.length) / 2;
+      const scoreB =
+        (bIdLength / b.id.length + bLabelLength / b.label.length) / 2;
+
+      if (scoreA > scoreB) {
+        return -1;
+      }
+
+      if (scoreA < scoreB) {
+        return 1;
+      }
+
+      return 0;
+    })
     .slice(0, config.search.languages.limit);
 });

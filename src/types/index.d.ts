@@ -6,9 +6,9 @@ export type Theme = "dark" | "light";
 
 export type ElectronTheme = NativeTheme["themeSource"];
 
-export type PrismData = {
-  grammar: Prism.Grammar;
-  name: string;
+export type IndentOption = {
+  character: " " | "\t";
+  label: string;
 };
 
 export type Indent = {
@@ -31,7 +31,7 @@ export type SlideData = {
   };
 };
 
-export type LanguageSelect = {
+export type LanguageOption = {
   id: string;
   label: string;
 };
@@ -59,14 +59,18 @@ export type AppConfig = {
   default: {
     slide: SlideData;
     indent: Indent;
-    language: LanguageSelect;
+    indentOption: IndentOption;
+    language: LanguageOption;
     fileName: string;
     color: string;
   };
 
+  indentOptions: IndentOption[];
+
   search: {
     languages: {
       limit: number;
+      delay: number;
     };
   };
 };

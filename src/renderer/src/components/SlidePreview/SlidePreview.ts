@@ -7,7 +7,7 @@ import {
   watch,
 } from "vue";
 
-import { PrismData, SlideData } from "@/types";
+import { SlideData } from "@/types";
 
 import { useCodeAnimation, useHighlightCode } from "@renderer/hooks";
 import { DiffAnimationPrimitive } from "@renderer/types";
@@ -21,7 +21,7 @@ export default defineComponent({
   },
 
   props: {
-    language: { type: Object as PropType<PrismData>, required: true },
+    language: { type: String, required: true },
     slides: { type: Array as PropType<SlideData[]>, required: true },
     selectedSlide: { type: Number, required: true },
     fileName: { type: String, required: true },
@@ -37,11 +37,7 @@ export default defineComponent({
     const timelineCompleted = ref(false);
 
     onBeforeMount(() => {
-      primitives = generateAnimationsPrimitives(
-        props.slides,
-        props.language.name,
-        props.language.grammar,
-      );
+      primitives = generateAnimationsPrimitives(props.slides, props.language);
     });
 
     const animationId = computed(() => Math.max(0, props.selectedSlide - 1));
@@ -50,8 +46,7 @@ export default defineComponent({
       if (props.selectedSlide === 0 || timelineCompleted.value) {
         return generateHighlightedCode(
           props.slides[props.selectedSlide].code,
-          props.language.name,
-          props.language.grammar,
+          props.language,
         );
       }
 

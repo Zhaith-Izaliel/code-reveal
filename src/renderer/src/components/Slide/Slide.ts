@@ -1,7 +1,6 @@
 import { defineComponent, computed, PropType } from "vue";
 
 import { AppThumbnailConfig, Indent } from "@/types";
-import { PrismData } from "@/types";
 
 import _ from "lodash";
 import { toPng } from "html-to-image";
@@ -47,7 +46,7 @@ export default defineComponent({
   ],
 
   props: {
-    language: { type: Object as PropType<PrismData>, required: true },
+    language: { type: String, required: true },
     indent: { type: Object as PropType<Indent>, required: true },
     code: { type: String, required: true },
     color: { type: String, required: true },
@@ -75,11 +74,7 @@ export default defineComponent({
     };
 
     const highlightedCode = computed((): string =>
-      generateHighlightedCode(
-        props.code,
-        props.language.name,
-        props.language.grammar,
-      ),
+      generateHighlightedCode(props.code, props.language),
     );
 
     const fileNameInputSize = computed(() => props.fileName.length);

@@ -18,11 +18,10 @@ export function indent(char: "\t" | " ", n: number): string {
 export function generateHighlightedCode(
   code: string,
   language: string,
-  grammar: Prism.Grammar,
 ): string {
   if (code === "") {
     return "";
   }
 
-  return Prism.highlight(code, grammar, language);
+  return Prism.highlight(code, Prism.languages[language], language);
 }

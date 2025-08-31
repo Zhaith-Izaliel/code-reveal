@@ -1,17 +1,24 @@
-import { computed, defineComponent, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 
-import Prism from "prismjs";
+import _ from "lodash";
 import { Mode } from "@renderer/types";
 
 import { useSlides } from "@renderer/hooks";
 
-import { Button, Dialog, AutoComplete, FloatLabel } from "primevue";
+import {
+  Button,
+  Dialog,
+  Select,
+  FloatLabel,
+  InputNumber,
+  SelectFilterEvent,
+} from "primevue";
 import Slide from "@renderer/components/Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
 import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
-import { Indent, LanguageSelect, PrismData, Save } from "@/types";
+import { Indent, IndentOption, LanguageOption, Save } from "@/types";
 
 // function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
 //   if (mode === Mode.Preview) {
@@ -54,7 +61,8 @@ import { Indent, LanguageSelect, PrismData, Save } from "@/types";
 
 export default defineComponent({
   components: {
-    AutoComplete,
+    PrimeSelect: Select,
+    InputNumber,
     FloatLabel,
     Slide,
     SlidePreview,
@@ -67,37 +75,46 @@ export default defineComponent({
 
   setup() {
     const { config } = window;
+    const slidesHook = useSlides();
 
-    const selectedLanguage = ref<LanguageSelect>({
-      ...config.default.language,
-    });
-
-    const language = ref<PrismData>({
-      name: selectedLanguage.value.id,
-      grammar: Prism.languages[config.default.language],
-    });
-    const indent = ref<Indent>({ ...config.default.indent });
-    const color = ref<string>(config.default.color);
-    const fileName = ref<string>(config.default.fileName);
+    // Required prop
     const codeAreaSize = ref(1);
 
+    // Language management
+    const language = ref<LanguageOption>({ ...config.default.language });
+    const shownLanguages = ref<LanguageOption[]>([]);
+
+    const searchLanguage = _.debounce(async (event: SelectFilterEvent) => {
+      shownLanguages.value = await window.search.languages(event.value || "");
+    }, config.search.languages.delay);
+
+    onMounted(() => {
+      window.search
+        .languages(language.value.id)
+        .then((items: LanguageOption[]) => {
+          shownLanguages.value = items;
+        });
+    });
+
+    // Indent Management
+    const selectedIndent = ref<IndentOption>(config.default.indentOption);
+    const indent = ref<Indent>({
+      character: selectedIndent.value.character,
+      number: config.default.indent.number,
+    });
+    const indentOptions = ref<IndentOption[]>(config.indentOptions);
+
+    // Modals Bools
     const changeLanguageModalVisible = ref(false);
     const animationSettingsModalVisible = ref(false);
 
-    const slidesHook = useSlides();
-
-    const shownLanguages = ref<LanguageSelect[]>([]);
-
-    const searchLanguage = async (query: string) => {
-      shownLanguages.value = await window.search.languages(query);
-    };
-
+    // Save Management
     const save = reactive<Save>({
       slides: slidesHook.slides,
-      fileName: fileName.value,
-      color: color.value,
+      fileName: config.default.fileName,
+      color: config.default.colog,
       indent: indent.value,
-      language: language.value.name,
+      language: language.value.id,
     });
 
     // Modes
@@ -117,19 +134,25 @@ export default defineComponent({
 
     return {
       ...slidesHook,
-      language,
-      indent,
-      color,
-      fileName,
+      // Required props
       codeAreaSize,
-      mode,
-      togglePreview,
+      // Language management
+      language,
+      searchLanguage,
+      shownLanguages,
+      // Indent management
+      indent,
+      indentOptions,
+      selectedIndent,
+      // Modals
       animationSettingsModalVisible,
       changeLanguageModalVisible,
+      // Save management
+      save,
+      // Mode
+      mode,
+      togglePreview,
       isPreview,
-      searchLanguage,
-      selectedLanguage,
-      shownLanguages,
     };
   },
 });

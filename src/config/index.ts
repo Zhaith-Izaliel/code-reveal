@@ -28,7 +28,23 @@ export const config: AppConfig = {
       number: 2,
       character: " ",
     },
+
+    indentOption: {
+      character: " ",
+      label: "Spaces",
+    },
   },
+
+  indentOptions: [
+    {
+      character: " ",
+      label: "Spaces",
+    },
+    {
+      character: "\t",
+      label: "Tabs",
+    },
+  ],
 
   thumbnail: {
     width: 800,
@@ -44,6 +60,7 @@ export const config: AppConfig = {
   search: {
     languages: {
       limit: 10,
+      delay: 200,
     },
   },
 };

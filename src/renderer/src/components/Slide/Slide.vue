@@ -2,7 +2,7 @@
   <code-window
     :code-area-size="codeAreaSize"
     :color="color"
-    :language="language.name"
+    :language="language"
     @thumbnail-changed="updateThumbnail"
   >
     <template #color-picker>

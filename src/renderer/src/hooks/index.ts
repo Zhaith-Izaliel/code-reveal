@@ -122,11 +122,7 @@ function generateElement(id: string, content: string, style: string): string {
   return `<span id="${id}" class="absolute" style="${style}">${content}</span>`;
 }
 
-function generateDiffs(
-  slides: SlideData[],
-  language: string,
-  grammar: Prism.Grammar,
-): CodeDiff[][] {
+function generateDiffs(slides: SlideData[], language: string): CodeDiff[][] {
   let entries: CodeDiff[][] = [];
 
   for (let i = 0; i < slides.length - 1; i++) {
@@ -141,7 +137,7 @@ function generateDiffs(
         splitCode.forEach((str, index, array) => {
           finalDiff.push({
             code: str,
-            highlightedCode: generateHighlightedCode(str, language, grammar),
+            highlightedCode: generateHighlightedCode(str, language),
             op,
             isNewLine: array.length - 1 !== index,
           });
@@ -151,7 +147,7 @@ function generateDiffs(
 
       finalDiff.push({
         code,
-        highlightedCode: generateHighlightedCode(code, language, grammar),
+        highlightedCode: generateHighlightedCode(code, language),
         op,
         isNewLine: false,
       });
@@ -274,13 +270,12 @@ function generatePrimitivesForDiff(
 const generateAnimationsPrimitives = (
   slides: SlideData[],
   language: string,
-  grammar: Prism.Grammar,
 ): DiffAnimationPrimitive[][] => {
   if (slides.length <= 1 || slides.every((item) => item.code === "")) {
     return [];
   }
 
-  const diffs = generateDiffs(slides, language, grammar);
+  const diffs = generateDiffs(slides, language);
   return diffs.map(generatePrimitivesForDiff);
 };
 

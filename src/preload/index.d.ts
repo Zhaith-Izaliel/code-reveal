@@ -1,7 +1,7 @@
 import { NativeTheme } from "electron";
 import { ElectronAPI } from "@electron-toolkit/preload";
 import { AppConfig } from "../config";
-import { Theme, ElectronTheme, LanguageSelect } from "../types";
+import { Theme, ElectronTheme, LanguageOption } from "../types";
 
 declare global {
   interface Window {
@@ -13,7 +13,7 @@ declare global {
       get: () => Promise<Theme>;
     };
     search: {
-      languages: (query: string) => Promise<LanguageSelect[]>;
+      languages: (query: string) => Promise<LanguageOption[]>;
     };
   }
 }

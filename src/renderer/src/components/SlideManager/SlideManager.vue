@@ -3,23 +3,52 @@
     v-model:visible="changeLanguageModalVisible"
     modal
     header="Change language"
-    class="w-[25rem]"
+    class="w-1/3"
   >
-    <float-label variant="on" class="w-full">
-      <auto-complete
-        v-model="selectedLanguage"
-        optionLabel="label"
-        class="w-full"
-        :suggestions="shownLanguages"
-        @complete="
-          async (event) => {
-            await searchLanguage(event.query);
-          }
-        "
-        inputId="on_label"
-      />
-      <label for="on_label">Select language</label>
-    </float-label>
+    <main class="flex flex-col space-y-4 mt-4">
+      <float-label variant="on" class="w-full">
+        <prime-select
+          v-model="language"
+          optionLabel="label"
+          class="w-full"
+          :options="shownLanguages"
+          filter
+          checkmark
+          inputId="language_label"
+          @filter="searchLanguage"
+        />
+        <label for="language_label">Select language</label>
+      </float-label>
+      <hr class="text-zinc-400 dark:text-zinc-600" />
+      <h2 class="text-lg font-semibold">Indentation</h2>
+      <section class="w-full flex space-x-2">
+        <float-label variant="on" class="w-1/2">
+          <prime-select
+            v-model="selectedIndent"
+            optionLabel="label"
+            class="w-full"
+            :options="indentOptions"
+            checkmark
+            inputId="indent_label"
+          />
+          <label for="indent_label">Character</label>
+        </float-label>
+        <float-label variant="on" class="w-1/2">
+          <input-number
+            v-model="indent.number"
+            inputId="indent_number"
+            showButtons
+            fluid
+            :min="1"
+          />
+          <label for="indent_number">Number</label>
+        </float-label>
+      </section>
+      <p class="text-zinc-600 dark:text-zinc-400 text-sm text-center">
+        Changing the indentation will not apply it to the slides you already
+        created and indented.
+      </p>
+    </main>
   </prime-dialog>
   <prime-dialog
     v-model:visible="animationSettingsModalVisible"
@@ -103,19 +132,19 @@
         <slide
           v-if="!isPreview"
           v-model:code="slides[selectedIndex].code"
-          v-model:file-name="fileName"
-          v-model:color="color"
+          v-model:file-name="save.fileName"
+          v-model:color="save.color"
           v-model:thumbnail="slides[selectedIndex].thumbnail"
           v-model:code-area-size="codeAreaSize"
-          :language="language"
+          :language="language.id"
           :indent="indent"
           class="w-full xl:w-1/2 m-auto mt-8"
         />
         <slide-preview
           v-else
-          :language="language"
-          :color="color"
-          :file-name="fileName"
+          :language="language.id"
+          :color="save.color"
+          :file-name="save.fileName"
           :code-area-size="codeAreaSize"
           :selected-slide="selectedIndex"
           :slides="slides"
