@@ -4,7 +4,23 @@
     modal
     header="Change language"
     class="w-[25rem]"
-  ></prime-dialog>
+  >
+    <float-label variant="on" class="w-full">
+      <auto-complete
+        v-model="selectedLanguage"
+        optionLabel="label"
+        class="w-full"
+        :suggestions="shownLanguages"
+        @complete="
+          async (event) => {
+            await searchLanguage(event.query);
+          }
+        "
+        inputId="on_label"
+      />
+      <label for="on_label">Select language</label>
+    </float-label>
+  </prime-dialog>
   <prime-dialog
     v-model:visible="animationSettingsModalVisible"
     modal

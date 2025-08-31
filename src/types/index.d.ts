@@ -31,6 +31,11 @@ export type SlideData = {
   };
 };
 
+export type LanguageSelect = {
+  id: string;
+  label: string;
+};
+
 export type Save = {
   fileName: string;
   color: string;
@@ -54,8 +59,14 @@ export type AppConfig = {
   default: {
     slide: SlideData;
     indent: Indent;
-    language: string;
+    language: LanguageSelect;
     fileName: string;
     color: string;
+  };
+
+  search: {
+    languages: {
+      limit: number;
+    };
   };
 };

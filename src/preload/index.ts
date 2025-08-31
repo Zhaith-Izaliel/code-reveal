@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
 import { config } from "../config";
-import { ElectronTheme, Theme } from "../types";
+import { ElectronTheme, LanguageSelect, Theme } from "../types";
 
 // Custom APIs for renderer
 const api = {};
@@ -18,6 +18,10 @@ if (process.contextIsolated) {
       set: (theme: ElectronTheme): Promise<Theme> =>
         ipcRenderer.invoke("theme:set", theme),
       get: (): Promise<Theme> => ipcRenderer.invoke("theme:get"),
+    });
+    contextBridge.exposeInMainWorld("search", {
+      languages: (query: string): Promise<LanguageSelect[]> =>
+        ipcRenderer.invoke("search:languages", query),
     });
   } catch (error) {
     console.error(error);

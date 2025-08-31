@@ -8,8 +8,11 @@ import {
 } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import escape from "regexp.escape";
 import icon from "../../resources/icon.png?asset";
-import { Theme } from "../types";
+import { LanguageSelect, Theme } from "../types";
+import languages from "../config/languages";
+import { config } from "../config";
 
 /**
  *
@@ -93,3 +96,12 @@ ipcMain.handle(
   "theme:get",
   (): Theme => (nativeTheme.shouldUseDarkColors ? "dark" : "light"),
 );
+
+ipcMain.handle("search:languages", (_, query: string): LanguageSelect[] => {
+  const re = new RegExp(escape(query), "gi");
+  return languages
+    .filter(
+      (item) => item.id.match(re) !== null || item.label.match(re) !== null,
+    )
+    .slice(0, config.search.languages.limit);
+});

@@ -19,7 +19,10 @@ export const config: AppConfig = {
       },
     },
 
-    language: "typescript",
+    language: {
+      id: "typescript",
+      label: "TypeScript",
+    },
 
     indent: {
       number: 2,
@@ -36,5 +39,11 @@ export const config: AppConfig = {
       theme === "dark" ? "#050505" : "#FEFEFE",
 
     delay: 200,
+  },
+
+  search: {
+    languages: {
+      limit: 10,
+    },
   },
 };
