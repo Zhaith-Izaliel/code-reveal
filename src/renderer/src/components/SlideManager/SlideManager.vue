@@ -3,7 +3,7 @@
     v-model:visible="changeLanguageModalVisible"
     modal
     header="Change language"
-    class="w-1/3"
+    class="w-1/3 xl:w-1/6"
   >
     <template #header>
       <main class="flex flex-col space-y-2">
