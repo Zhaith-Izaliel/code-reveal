@@ -24,27 +24,8 @@ export const config: AppConfig = {
       label: "TypeScript",
     },
 
-    indent: {
-      number: 2,
-      character: " ",
-    },
-
-    indentOption: {
-      character: " ",
-      label: "Spaces",
-    },
+    indent: 2,
   },
-
-  indentOptions: [
-    {
-      character: " ",
-      label: "Spaces",
-    },
-    {
-      character: "\t",
-      label: "Tabs",
-    },
-  ],
 
   thumbnail: {
     width: 800,

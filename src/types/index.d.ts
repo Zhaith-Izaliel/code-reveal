@@ -6,16 +6,6 @@ export type Theme = "dark" | "light";
 
 export type ElectronTheme = NativeTheme["themeSource"];
 
-export type IndentOption = {
-  character: " " | "\t";
-  label: string;
-};
-
-export type Indent = {
-  number: number;
-  character: " " | "\t";
-};
-
 export type SlideData = {
   code: string;
   thumbnail: string;
@@ -41,7 +31,7 @@ export type Save = {
   color: string;
   slides: SlideData[];
   language: string;
-  indent: Indent;
+  indent: number;
 };
 
 export type AppThumbnailConfig = {
@@ -58,14 +48,11 @@ export type AppConfig = {
 
   default: {
     slide: SlideData;
-    indent: Indent;
-    indentOption: IndentOption;
+    indent: number;
     language: LanguageOption;
     fileName: string;
     color: string;
   };
-
-  indentOptions: IndentOption[];
 
   search: {
     languages: {

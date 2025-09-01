@@ -1,6 +1,6 @@
 import { defineComponent, computed, PropType } from "vue";
 
-import { AppThumbnailConfig, Indent } from "@/types";
+import { AppThumbnailConfig } from "@/types";
 
 import _ from "lodash";
 import { toPng } from "html-to-image";
@@ -47,7 +47,7 @@ export default defineComponent({
 
   props: {
     language: { type: String, required: true },
-    indent: { type: Object as PropType<Indent>, required: true },
+    indent: { type: Number, required: true },
     code: { type: String, required: true },
     color: { type: String, required: true },
     fileName: { type: String, required: true },
@@ -93,10 +93,10 @@ export default defineComponent({
 
         el.value =
           el.value.substring(0, start) +
-          indent(props.indent.character, props.indent.number) +
+          indent(" ", props.indent) +
           el.value.substring(end);
 
-        el.selectionStart = el.selectionEnd = start + props.indent.number;
+        el.selectionStart = el.selectionEnd = start + props.indent;
 
         el.dispatchEvent(new Event("input"));
 

@@ -8,7 +8,7 @@ export async function setTheme(theme: ElectronTheme) {
 }
 
 export function indent(char: "\t" | " ", n: number): string {
-  if (n < 0) {
+  if (n <= 0) {
     return "";
   }
 
@@ -23,5 +23,9 @@ export function generateHighlightedCode(
     return "";
   }
 
-  return Prism.highlight(code, Prism.languages[language], language);
+  const grammar = Prism.languages[language];
+
+  const highlighted = Prism.highlight(code, grammar, language);
+
+  return highlighted;
 }

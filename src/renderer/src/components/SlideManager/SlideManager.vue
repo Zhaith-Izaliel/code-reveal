@@ -8,7 +8,7 @@
     <template #header>
       <main class="flex flex-col space-y-2">
         <h1 class="text-xl font-semibold">Change Language</h1>
-        <p class="text-sm text-red-900 dark:text-red-300 text-center">
+        <p class="text-sm text-red-900 dark:text-red-300">
           This applies it to
           <b>all the slides</b>.
         </p>
@@ -20,38 +20,29 @@
           <prime-select
             v-model="language"
             optionLabel="label"
+            optionValue="id"
             class="w-full"
             :options="shownLanguages"
             filter
             checkmark
             inputId="language_label"
             @filter="searchLanguage"
+            fluid
           />
           <label for="language_label">Select language</label>
         </float-label>
-        <hr class="text-zinc-400 dark:text-zinc-600" />
+        <hr class="text-zinc-400 dark:text-zinc-600 border" />
         <h2 class="text-lg font-semibold">Indentation</h2>
         <section class="w-full flex space-x-2">
-          <float-label variant="on" class="w-1/2">
-            <prime-select
-              v-model="selectedIndent"
-              optionLabel="label"
-              class="w-full"
-              :options="indentOptions"
-              checkmark
-              inputId="indent_label"
-            />
-            <label for="indent_label">Character</label>
-          </float-label>
-          <float-label variant="on" class="w-1/2">
+          <float-label variant="on" class="w-full">
             <input-number
-              v-model="indent.number"
+              v-model="indent"
               inputId="indent_number"
               showButtons
-              fluid
               :min="1"
+              fluid
             />
-            <label for="indent_number">Number</label>
+            <label for="indent_number">Number of spaces</label>
           </float-label>
         </section>
       </main>
@@ -149,13 +140,13 @@
           v-model:color="save.color"
           v-model:thumbnail="slides[selectedIndex].thumbnail"
           v-model:code-area-size="codeAreaSize"
-          :language="language.id"
+          :language="language"
           :indent="indent"
           class="w-full xl:w-1/2 m-auto mt-8"
         />
         <slide-preview
           v-else
-          :language="language.id"
+          :language="language"
           :color="save.color"
           :file-name="save.fileName"
           :code-area-size="codeAreaSize"

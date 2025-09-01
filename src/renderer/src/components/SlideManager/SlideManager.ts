@@ -18,7 +18,7 @@ import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
 import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
-import { Indent, IndentOption, LanguageOption, Save } from "@/types";
+import { LanguageOption, Save } from "@/types";
 
 // function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
 //   if (mode === Mode.Preview) {
@@ -81,7 +81,7 @@ export default defineComponent({
     const codeAreaSize = ref(1);
 
     // Language management
-    const language = ref<LanguageOption>({ ...config.default.language });
+    const language = ref<string>(config.default.language.id);
     const shownLanguages = ref<LanguageOption[]>([]);
 
     const searchLanguage = _.debounce(async (event: SelectFilterEvent) => {
@@ -90,19 +90,14 @@ export default defineComponent({
 
     onMounted(() => {
       window.search
-        .languages(language.value.id)
+        .languages(language.value)
         .then((items: LanguageOption[]) => {
           shownLanguages.value = items;
         });
     });
 
     // Indent Management
-    const selectedIndent = ref<IndentOption>(config.default.indentOption);
-    const indent = ref<Indent>({
-      character: selectedIndent.value.character,
-      number: config.default.indent.number,
-    });
-    const indentOptions = ref<IndentOption[]>(config.indentOptions);
+    const indent = ref<number>(config.default.indent);
 
     // Modals Bools
     const changeLanguageModalVisible = ref(false);
@@ -114,7 +109,7 @@ export default defineComponent({
       fileName: config.default.fileName,
       color: config.default.color,
       indent: indent.value,
-      language: language.value.id,
+      language: language.value,
     });
 
     // Modes
@@ -142,8 +137,6 @@ export default defineComponent({
       shownLanguages,
       // Indent management
       indent,
-      indentOptions,
-      selectedIndent,
       // Modals
       animationSettingsModalVisible,
       changeLanguageModalVisible,
