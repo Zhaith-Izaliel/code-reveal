@@ -25,7 +25,7 @@
     <article
       :ref="
         (el) => {
-          emit('thumbnailChanged', el);
+          emit('codeChanged', el);
         }
       "
       class="flex space-x-3 relative w-full h-full p-4 font-mono min-h-[30rem]"
@@ -50,6 +50,6 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "thumbnailChanged", el: any): void;
+  (e: "codeChanged", el: any): void;
 }>();
 </script>

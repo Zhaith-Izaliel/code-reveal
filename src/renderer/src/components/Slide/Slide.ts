@@ -1,4 +1,4 @@
-import { defineComponent, computed, PropType } from "vue";
+import { defineComponent, computed } from "vue";
 
 import { AppThumbnailConfig } from "@/types";
 

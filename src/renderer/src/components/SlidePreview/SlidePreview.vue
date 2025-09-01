@@ -3,6 +3,11 @@
     :code-area-size="codeAreaSize"
     :color="color"
     :language="language"
+    @code-changed="
+      () => {
+        generateAndPlayAnimation();
+      }
+    "
   >
     <template #file-name>
       <span class="file-name" :style="{ width: `${fileName.length}ch` }">{{
@@ -10,14 +15,7 @@
       }}</span>
     </template>
     <template #default>
-      <span
-        v-html="codeToDisplay"
-        :ref="
-          () => {
-            generateAndPlayAnimation();
-          }
-        "
-      ></span>
+      <span v-html="codeToDisplay"></span>
     </template>
   </code-window>
 </template>

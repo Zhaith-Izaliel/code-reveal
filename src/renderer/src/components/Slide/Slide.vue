@@ -3,7 +3,7 @@
     :code-area-size="codeAreaSize"
     :color="color"
     :language="language"
-    @thumbnail-changed="updateThumbnail"
+    @code-changed="updateThumbnail"
   >
     <template #color-picker>
       <color-picker
