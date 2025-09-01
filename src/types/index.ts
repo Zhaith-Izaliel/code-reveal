@@ -1,6 +1,7 @@
 import { NativeTheme } from "electron";
-import { EasingParam } from "animejs";
-import Prism from "prismjs";
+import { EaseStringParamNames } from "animejs";
+import * as t from "io-ts";
+import { TSlideData } from "./generated";
 
 export type Theme = "dark" | "light";
 
@@ -12,11 +13,11 @@ export type SlideData = {
   animations: {
     move: {
       duration: number;
-      ease: EasingParam;
+      ease: EaseStringParamNames;
     };
     fade: {
       duration: number;
-      ease: EasingParam;
+      ease: EaseStringParamNames;
     };
   };
 };
@@ -26,13 +27,15 @@ export type LanguageOption = {
   label: string;
 };
 
-export type Save = {
-  fileName: string;
-  color: string;
-  slides: SlideData[];
-  language: string;
-  indent: number;
-};
+export const TSave = t.type({
+  fileName: t.string,
+  color: t.string,
+  slides: t.array(TSlideData),
+  language: t.string,
+  indent: t.number,
+});
+
+export type Save = t.TypeOf<typeof TSave>;
 
 export type AppThumbnailConfig = {
   width: number;

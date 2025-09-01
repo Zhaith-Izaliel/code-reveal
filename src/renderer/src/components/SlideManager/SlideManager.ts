@@ -1,4 +1,4 @@
-import { computed, defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, toRaw } from "vue";
 
 import _ from "lodash";
 import { Mode } from "@renderer/types";
@@ -12,6 +12,7 @@ import {
   FloatLabel,
   InputNumber,
   SelectFilterEvent,
+  useToast,
 } from "primevue";
 import Slide from "@renderer/components/Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
@@ -76,6 +77,7 @@ export default defineComponent({
   setup() {
     const { config } = window;
     const slidesHook = useSlides();
+    const toast = useToast();
 
     // Required prop
     const codeAreaSize = ref(1);
@@ -104,13 +106,66 @@ export default defineComponent({
     const animationSettingsModalVisible = ref(false);
 
     // Save Management
-    const save = reactive<Save>({
-      slides: slidesHook.slides,
+    const save = ref<Save>({
+      slides: toRaw(slidesHook.slides.value),
       fileName: config.default.fileName,
       color: config.default.color,
       indent: indent.value,
       language: language.value,
     });
+
+    const saveLocation = ref<string>("");
+
+    const readSave = async () => {
+      try {
+        const tuple = await window.save.read();
+        saveLocation.value = tuple[1];
+        save.value = tuple[0];
+        slidesHook.slides.value = save.value.slides;
+        toast.add({
+          severity: "success",
+          summary: "Open",
+          detail: "The file has been opened successfully.",
+          life: 6000,
+        });
+      } catch (err: any) {
+        const message = err.message ? err.message : "Couldn't open file.";
+        toast.add({
+          severity: "error",
+          summary: "Open",
+          detail: message,
+          life: 6000,
+        });
+      }
+    };
+
+    const writeSave = async (file = "", saveAs = false) => {
+      try {
+        await window.save.write(
+          // HACK: I would prefer to use toRaw but it fails with some arrays.
+          JSON.parse(JSON.stringify(save.value)),
+          file,
+          saveAs,
+        );
+
+        toast.add({
+          severity: "success",
+          summary: "Save",
+          detail: "The file has been saved successfully.",
+          life: 6000,
+        });
+      } catch (err: any) {
+        console.error(err);
+        const message = err.message ? err.message : "Couldn't save file.";
+
+        toast.add({
+          severity: "error",
+          summary: "Save",
+          detail: message,
+          life: 6000,
+        });
+      }
+    };
 
     // Modes
     const mode = ref(Mode.Normal);
@@ -142,6 +197,9 @@ export default defineComponent({
       changeLanguageModalVisible,
       // Save management
       save,
+      saveLocation,
+      readSave,
+      writeSave,
       // Mode
       mode,
       togglePreview,

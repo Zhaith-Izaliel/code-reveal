@@ -131,6 +131,21 @@
             animationSettingsModalVisible = true;
           }
         "
+        @save="
+          async () => {
+            await writeSave(saveLocation);
+          }
+        "
+        @save-as="
+          async () => {
+            await writeSave(saveLocation, true);
+          }
+        "
+        @open-save="
+          async () => {
+            await readSave();
+          }
+        "
       />
       <template v-if="slides[selectedIndex]">
         <slide

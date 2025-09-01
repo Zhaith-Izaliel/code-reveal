@@ -1,7 +1,7 @@
 import { NativeTheme } from "electron";
 import { ElectronAPI } from "@electron-toolkit/preload";
 import { AppConfig } from "../config";
-import { Theme, ElectronTheme, LanguageOption } from "../types";
+import { Theme, ElectronTheme, LanguageOption, Save } from "../types";
 
 declare global {
   interface Window {
@@ -14,6 +14,10 @@ declare global {
     };
     search: {
       languages: (query: string) => Promise<LanguageOption[]>;
+    };
+    save: {
+      read: () => Promise<[Save, string]>;
+      write: (save: Save, file = "", saveAs = false) => Promise<void>;
     };
   }
 }

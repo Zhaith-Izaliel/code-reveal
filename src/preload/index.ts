@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
 import { config } from "../config";
-import { ElectronTheme, LanguageOption, Theme } from "../types";
+import { ElectronTheme, LanguageOption, Save, Theme } from "../types";
 
 // Custom APIs for renderer
 const api = {};
@@ -22,6 +22,12 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld("search", {
       languages: (query: string): Promise<LanguageOption[]> =>
         ipcRenderer.invoke("search:languages", query),
+    });
+    contextBridge.exposeInMainWorld("save", {
+      read: async (): Promise<[Save, string]> =>
+        await ipcRenderer.invoke("save:read"),
+      write: async (save: Save, file = "", saveAs = false) =>
+        await ipcRenderer.invoke("save:write", save, file, saveAs),
     });
   } catch (error) {
     console.error(error);

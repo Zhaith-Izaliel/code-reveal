@@ -40,10 +40,10 @@
       <prime-button
         v-if="slidesNumber === 0"
         severity="secondary"
-        :label="importButton.label"
-        :icon="importButton.icon"
+        :label="openButton.label"
+        :icon="openButton.icon"
         raised
-        @click.prevent="importButton.command"
+        @click.prevent="openButton.command"
       />
       <split-button
         v-else
@@ -135,7 +135,7 @@ const emit = defineEmits([
   "saveAs",
   "preview",
   "endPreview",
-  "importSlides",
+  "openSave",
   "exportVideo",
   "autoPlay",
   "changeLanguage",
@@ -152,10 +152,10 @@ const previewMenuItems = [
   },
 ];
 
-const importButton = {
-  label: "Import",
+const openButton = {
+  label: "Open",
   icon: "pi pi-file-import",
-  command: () => emit("importSlides"),
+  command: () => emit("openSave"),
 };
 
 const confirmClear = () => {
@@ -178,7 +178,7 @@ const confirmClear = () => {
 
 const saveMenuItems = [
   {
-    label: "Save to location",
+    label: "Save as",
     icon: "pi pi-file-export",
     command: () => emit("saveAs"),
   },
@@ -190,6 +190,6 @@ const saveMenuItems = [
   {
     separator: true,
   },
-  importButton,
+  openButton,
 ];
 </script>
