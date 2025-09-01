@@ -1,6 +1,8 @@
 import * as t from "io-ts";
 
 // Generated with ts-to-io
+// Command: npx ts-to-io types/index.ts --follow-imports
+
 export const TSlideData = t.type({
   code: t.string,
   thumbnail: t.string,
