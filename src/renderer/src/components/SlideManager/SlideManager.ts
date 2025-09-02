@@ -1,7 +1,15 @@
-import { computed, defineComponent, onMounted, ref, toRaw } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  toRaw,
+  watch,
+} from "vue";
 
 import _ from "lodash";
-import { Mode } from "@renderer/types";
+import { Mode, ModeOption } from "@renderer/types";
 
 import { useSlides } from "@renderer/hooks";
 
@@ -168,19 +176,49 @@ export default defineComponent({
     };
 
     // Modes
-    const mode = ref(Mode.Normal);
+    const mode = ref<Mode>("normal");
 
-    const togglePreview = (on: boolean) => {
-      if (on) {
-        mode.value = Mode.Preview;
-        slidesHook.selectedIndex.value = 0;
-        return;
+    const slidesLength = computed((): number => slidesHook.slides.value.length);
+
+    const modes = reactive<ModeOption[]>([
+      {
+        label: "Normal",
+        value: "normal",
+        disabled: false,
+        icon: "pi pi-pencil",
+      },
+      {
+        label: "Preview",
+        value: "preview",
+        disabled: true,
+        icon: "pi pi-eye",
+      },
+      {
+        label: "Auto-Play",
+        value: "autoplay",
+        disabled: true,
+        icon: "pi pi-play-circle",
+      },
+    ]);
+
+    const isPreviewOrAutoplay = computed(
+      (): boolean => mode.value === "preview" || mode.value === "autoplay",
+    );
+
+    watch(slidesLength, (newLength: number) => {
+      const previewIdx = modes.findIndex((item) => item.value === "preview");
+
+      const autoplayIdx = modes.findIndex((item) => item.value === "autoplay");
+
+      if (previewIdx !== -1) {
+        modes[previewIdx].disabled = newLength <= 1;
+      }
+      if (autoplayIdx !== -1) {
+        modes[autoplayIdx].disabled = newLength <= 1;
       }
 
-      mode.value = Mode.Normal;
-    };
-
-    const isPreview = computed((): boolean => mode.value === Mode.Preview);
+      console.log(modes);
+    });
 
     return {
       ...slidesHook,
@@ -202,8 +240,8 @@ export default defineComponent({
       writeSave,
       // Mode
       mode,
-      togglePreview,
-      isPreview,
+      modes,
+      isPreviewOrAutoplay,
     };
   },
 });

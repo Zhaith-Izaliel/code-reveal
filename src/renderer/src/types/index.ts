@@ -1,9 +1,13 @@
 import { INSERT, EQUAL, DELETE } from "fast-diff";
 
-export enum Mode {
-  Normal,
-  Preview,
-}
+export type Mode = "normal" | "preview" | "autoplay";
+
+export type ModeOption = {
+  label: string;
+  value: Mode;
+  disabled: boolean;
+  icon: string;
+};
 
 export enum ActionType {
   Noop,

@@ -65,7 +65,7 @@
       :class="[
         `min-h-screen h-full w-2/7 xl:w-1/7 bg-surface-100/80 dark:bg-surface-800/80 backdrop-blur-lg p-4 flex flex-col`,
         {
-          'opacity-20 pointer-events-none': isPreview,
+          'opacity-20 pointer-events-none': isPreviewOrAutoplay,
         },
       ]"
     >
@@ -115,10 +115,9 @@
     <section class="w-5/7 xl:w-6/7 h-full px-6 xl:px-12">
       <toolbar
         :slides-number="slides.length"
-        :is-preview="isPreview"
+        :modes="modes"
+        v-model:mode="mode"
         @clear="clearSlides"
-        @preview="togglePreview(true)"
-        @end-preview="togglePreview(false)"
         @next-slide="selectSlide(selectedIndex + 1, true)"
         @prev-slide="selectSlide(selectedIndex - 1, true)"
         @change-language="
@@ -149,7 +148,7 @@
       />
       <template v-if="slides[selectedIndex]">
         <slide
-          v-if="!isPreview"
+          v-if="!isPreviewOrAutoplay"
           v-model:code="slides[selectedIndex].code"
           v-model:file-name="save.fileName"
           v-model:color="save.color"
