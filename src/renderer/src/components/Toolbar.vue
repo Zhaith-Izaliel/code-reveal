@@ -25,23 +25,8 @@
     </section>
     <section class="flex justify-center items-center w-full">
       <section
-        :class="[
-          `flex items-center justify-center space-x-3`,
-          {
-            'pr-6 mr-6 border-r border-surface-400 dark:border-surface-600':
-              mode !== 'preview',
-          },
-        ]"
+        class="flex items-center justify-center space-x-3 pr-6 mr-6 border-r border-surface-400 dark:border-surface-600"
       >
-        <prime-button
-          v-if="mode === 'preview'"
-          severity="secondary"
-          icon="pi pi-chevron-left"
-          rounded
-          v-tooltip.bottom="'Previous slide'"
-          raised
-          @click.prevent="() => emit('prevSlide')"
-        />
         <!-- Same button -->
         <prime-button
           v-if="slidesNumber === 0"
@@ -60,64 +45,104 @@
           raised
           @click.prevent="() => emit('save')"
         />
-        <prime-button
-          v-if="mode === 'preview'"
-          severity="secondary"
-          icon="pi pi-chevron-right"
-          rounded
-          v-tooltip.bottom="'Next slide'"
-          raised
-          @click.prevent="() => emit('nextSlide')"
-        />
       </section>
-      <section
-        v-if="mode !== 'preview'"
-        class="flex items-center justify-center space-x-3"
-      >
-        <prime-button
-          severity="secondary"
-          v-tooltip.bottom="'Undo'"
-          raised
-          rounded
-          icon="pi pi-undo"
-          :disabled="slidesNumber === 0"
-          @click.prevent="() => emit('undo')"
-        />
-        <prime-button
-          severity="secondary"
-          v-tooltip.bottom="'Redo'"
-          raised
-          rounded
-          icon="pi pi-refresh"
-          :disabled="slidesNumber === 0"
-          @click.prevent="() => emit('redo')"
-        />
-        <prime-button
-          severity="secondary"
-          v-tooltip.bottom="'Change language'"
-          raised
-          rounded
-          icon="pi pi-code"
-          @click.prevent="() => emit('changeLanguage')"
-        />
-        <prime-button
-          severity="secondary"
-          v-tooltip.bottom="'Animation Settings'"
-          raised
-          rounded
-          icon="pi pi-sliders-h"
-          :disabled="slidesNumber === 0"
-          @click.prevent="() => emit('animationSettings')"
-        />
-        <prime-button
-          severity="danger"
-          v-tooltip.bottom="'Clear all slides'"
-          raised
-          rounded
-          icon="pi pi-eraser"
-          :disabled="slidesNumber === 0"
-          @click.prevent="confirmClear"
-        />
+      <section class="flex items-center justify-center space-x-3">
+        <template v-if="mode === 'preview'">
+          <prime-button
+            severity="secondary"
+            icon="pi pi-step-backward"
+            rounded
+            v-tooltip.bottom="'Backward'"
+            raised
+            @click.prevent="() => emit('prevSlide')"
+          />
+          <prime-button
+            severity="secondary"
+            icon="pi pi-play"
+            rounded
+            v-tooltip.bottom="'Play'"
+            raised
+            @click.prevent="() => emit('play')"
+          />
+          <prime-button
+            severity="secondary"
+            icon="pi pi-pause"
+            rounded
+            v-tooltip.bottom="'Pause'"
+            raised
+            @click.prevent="() => emit('pause')"
+          />
+          <prime-button
+            severity="secondary"
+            icon="pi pi-stop"
+            rounded
+            v-tooltip.bottom="'Stop'"
+            raised
+            @click.prevent="() => emit('stop')"
+          />
+          <prime-button
+            severity="secondary"
+            icon="pi pi-replay"
+            rounded
+            v-tooltip.bottom="'Replay'"
+            raised
+            @click.prevent="() => emit('replay')"
+          />
+          <prime-button
+            severity="secondary"
+            icon="pi pi-step-forward"
+            rounded
+            v-tooltip.bottom="'Forward'"
+            raised
+            @click.prevent="() => emit('nextSlide')"
+          />
+        </template>
+        <template v-else>
+          <prime-button
+            severity="secondary"
+            v-tooltip.bottom="'Undo'"
+            raised
+            rounded
+            icon="pi pi-undo"
+            :disabled="slidesNumber === 0"
+            @click.prevent="() => emit('undo')"
+          />
+          <prime-button
+            severity="secondary"
+            v-tooltip.bottom="'Redo'"
+            raised
+            rounded
+            icon="pi pi-refresh"
+            :disabled="slidesNumber === 0"
+            @click.prevent="() => emit('redo')"
+          />
+          <prime-button
+            severity="secondary"
+            v-tooltip.bottom="'Change language'"
+            raised
+            rounded
+            icon="pi pi-code"
+            @click.prevent="() => emit('changeLanguage')"
+          />
+          <prime-button
+            severity="secondary"
+            v-tooltip.bottom="'Animation Settings'"
+            raised
+            rounded
+            icon="pi pi-sliders-h"
+            :disabled="slidesNumber === 0"
+            @click.prevent="() => emit('animationSettings')"
+          />
+          <prime-button
+            severity="danger"
+            v-tooltip.bottom="'Clear all slides'"
+            raised
+            rounded
+            icon="pi pi-eraser"
+            :disabled="slidesNumber === 0"
+            @click.prevent="confirmClear"
+          />
+        </template>
       </section>
     </section>
   </header>
@@ -138,18 +163,26 @@ defineProps<{
 }>();
 
 const emit = defineEmits([
+  // Slides
   "undo",
   "redo",
   "clear",
+  // Language
+  "changeLanguage",
+  // Preview
+  "nextSlide",
+  "prevSlide",
+  // Save
   "save",
   "saveAs",
   "openSave",
   "exportVideo",
-  "autoPlay",
-  "changeLanguage",
+  // Animations
   "animationSettings",
-  "nextSlide",
-  "prevSlide",
+  "play",
+  "pause",
+  "replay",
+  "stop",
 ]);
 
 const openButton = {

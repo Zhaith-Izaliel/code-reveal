@@ -1,6 +1,6 @@
 import { INSERT, EQUAL, DELETE } from "fast-diff";
 
-export type Mode = "normal" | "preview" | "autoplay";
+export type Mode = "normal" | "preview";
 
 export type ModeOption = {
   label: string;

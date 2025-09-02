@@ -58,14 +58,14 @@
     v-model:visible="animationSettingsModalVisible"
     modal
     header="Animation Settings"
-    class="w-[25rem]"
+    class="w-1/3 xl:w-1/6"
   ></prime-dialog>
   <main class="flex h-full w-full">
     <aside
       :class="[
         `min-h-screen h-full w-2/7 xl:w-1/7 bg-surface-100/80 dark:bg-surface-800/80 backdrop-blur-lg p-4 flex flex-col`,
         {
-          'opacity-20 pointer-events-none': isPreviewOrAutoplay,
+          'opacity-20 pointer-events-none': isPreview,
         },
       ]"
     >
@@ -118,8 +118,20 @@
         :modes="modes"
         v-model:mode="mode"
         @clear="clearSlides"
-        @next-slide="selectSlide(selectedIndex + 1, true)"
-        @prev-slide="selectSlide(selectedIndex - 1, true)"
+        @next-slide="
+          () => {
+            if (timelineCompleted) {
+              selectSlide(selectedIndex + 1, true);
+            }
+          }
+        "
+        @prev-slide="
+          () => {
+            if (timelineCompleted) {
+              selectSlide(selectedIndex - 1, true);
+            }
+          }
+        "
         @change-language="
           () => {
             changeLanguageModalVisible = true;
@@ -148,7 +160,7 @@
       />
       <template v-if="slides[selectedIndex]">
         <slide
-          v-if="!isPreviewOrAutoplay"
+          v-if="!isPreview"
           v-model:code="slides[selectedIndex].code"
           v-model:file-name="save.fileName"
           v-model:color="save.color"
@@ -160,6 +172,7 @@
         />
         <slide-preview
           v-else
+          v-model:timeline-completed="timelineCompleted"
           :language="language"
           :color="save.color"
           :file-name="save.fileName"

@@ -1,11 +1,4 @@
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  ref,
-  watch,
-} from "vue";
+import { computed, defineComponent, onBeforeMount, PropType, watch } from "vue";
 
 import { SlideData } from "@/types";
 
@@ -27,14 +20,16 @@ export default defineComponent({
     fileName: { type: String, required: true },
     color: { type: String, required: true },
     codeAreaSize: { type: Number, required: true },
+    timelineCompleted: { type: Boolean, required: true },
   },
-  setup(props) {
+
+  emits: ["update:timelineCompleted"],
+
+  setup(props, { emit }) {
     const { generateHighlightedCode } = useHighlightCode();
     const { generateAnimationsPrimitives, assignTimeline } = useCodeAnimation();
 
     let primitives: DiffAnimationPrimitive[][] = [];
-
-    const timelineCompleted = ref(false);
 
     onBeforeMount(() => {
       primitives = generateAnimationsPrimitives(props.slides, props.language);
@@ -45,7 +40,7 @@ export default defineComponent({
     const codeToDisplay = computed(() => {
       if (
         props.selectedSlide === 0 ||
-        timelineCompleted.value ||
+        props.timelineCompleted ||
         primitives.length === 0
       ) {
         return generateHighlightedCode(
@@ -63,7 +58,7 @@ export default defineComponent({
     const generateAndPlayAnimation = () => {
       if (
         props.selectedSlide === 0 ||
-        timelineCompleted.value ||
+        props.timelineCompleted ||
         primitives.length === 0
       ) {
         return;
@@ -75,14 +70,18 @@ export default defineComponent({
       });
 
       timeline.play().then(() => {
-        timelineCompleted.value = true;
+        emit("update:timelineCompleted", true);
       });
     };
 
     watch(
       slideId,
-      () => {
-        timelineCompleted.value = false;
+      (newId) => {
+        if (newId === 0) {
+          return;
+        }
+
+        emit("update:timelineCompleted", false);
       },
       { immediate: true },
     );

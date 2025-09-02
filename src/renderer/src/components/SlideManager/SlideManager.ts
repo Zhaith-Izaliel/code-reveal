@@ -89,6 +89,7 @@ export default defineComponent({
 
     // Required prop
     const codeAreaSize = ref(1);
+    const timelineCompleted = ref(true);
 
     // Language management
     const language = ref<string>(config.default.language.id);
@@ -195,38 +196,29 @@ export default defineComponent({
         icon: "pi pi-eye",
         description: "Preview the animation slide by slide.",
       },
-      {
-        label: "Auto-Play",
-        value: "autoplay",
-        disabled: true,
-        icon: "pi pi-play-circle",
-        description: "Auto-play the animation from start to finish.",
-      },
     ]);
 
-    const isPreviewOrAutoplay = computed(
-      (): boolean => mode.value === "preview" || mode.value === "autoplay",
-    );
+    const isPreview = computed((): boolean => mode.value === "preview");
+
+    watch(isPreview, (newIsPreview) => {
+      if (newIsPreview) {
+        slidesHook.selectSlide(0);
+      }
+    });
 
     watch(slidesLength, (newLength: number) => {
       const previewIdx = modes.findIndex((item) => item.value === "preview");
 
-      const autoplayIdx = modes.findIndex((item) => item.value === "autoplay");
-
       if (previewIdx !== -1) {
         modes[previewIdx].disabled = newLength <= 1;
       }
-      if (autoplayIdx !== -1) {
-        modes[autoplayIdx].disabled = newLength <= 1;
-      }
-
-      console.log(modes);
     });
 
     return {
       ...slidesHook,
       // Required props
       codeAreaSize,
+      timelineCompleted,
       // Language management
       language,
       searchLanguage,
@@ -244,7 +236,7 @@ export default defineComponent({
       // Mode
       mode,
       modes,
-      isPreviewOrAutoplay,
+      isPreview,
     };
   },
 });
