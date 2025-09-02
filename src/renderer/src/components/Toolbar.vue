@@ -12,7 +12,11 @@
         :allow-empty="false"
       >
         <template #option="{ option }">
-          <p v-tooltip.bottom="`Switch to ${option.label.toLowerCase()} mode`">
+          <p v-if="!option.disabled" v-tooltip.bottom="option.description">
+            <i :class="`${option.icon} pr-1`"></i>
+            {{ option.label }}
+          </p>
+          <p v-else>
             <i :class="`${option.icon} pr-1`"></i>
             {{ option.label }}
           </p>

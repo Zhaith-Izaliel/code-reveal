@@ -186,18 +186,21 @@ export default defineComponent({
         value: "normal",
         disabled: false,
         icon: "pi pi-pencil",
+        description: "Edit the slides content and order.",
       },
       {
         label: "Preview",
         value: "preview",
         disabled: true,
         icon: "pi pi-eye",
+        description: "Preview the animation slide by slide.",
       },
       {
         label: "Auto-Play",
         value: "autoplay",
         disabled: true,
         icon: "pi pi-play-circle",
+        description: "Auto-play the animation from start to finish.",
       },
     ]);
 

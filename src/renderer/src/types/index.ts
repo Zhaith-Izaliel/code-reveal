@@ -7,6 +7,7 @@ export type ModeOption = {
   value: Mode;
   disabled: boolean;
   icon: string;
+  description: string;
 };
 
 export enum ActionType {
