@@ -13,7 +13,10 @@ declare global {
       get: () => Promise<Theme>;
     };
     search: {
-      languages: (query: string) => Promise<LanguageOption[]>;
+      languages: (
+        query: string,
+        selectedValue: string,
+      ) => Promise<LanguageOption[]>;
     };
     save: {
       read: () => Promise<[Save, string]>;

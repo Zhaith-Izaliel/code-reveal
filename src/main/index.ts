@@ -105,40 +105,54 @@ ipcMain.handle(
   (): Theme => (nativeTheme.shouldUseDarkColors ? "dark" : "light"),
 );
 
-ipcMain.handle("search:languages", (_, query: string): LanguageOption[] => {
-  const re = new RegExp(escape(query), "i");
-  return languages
-    .filter(
-      (item) => item.id.match(re) !== null || item.label.match(re) !== null,
-    )
-    .sort((a, b) => {
-      const matchAId = a.id.match(re);
-      const matchALabel = a.label.match(re);
-      const matchBId = b.id.match(re);
-      const matchBLabel = b.label.match(re);
+ipcMain.handle(
+  "search:languages",
+  (_, query: string, selectedValue: string): LanguageOption[] => {
+    const re = new RegExp(escape(query), "i");
+    return languages
+      .filter(
+        (item) =>
+          item.value.match(re) !== null ||
+          item.label.match(re) !== null ||
+          item.value === selectedValue,
+      )
+      .sort((a, b) => {
+        if (a.value === selectedValue) {
+          return -1;
+        }
 
-      const aIdLength = matchAId !== null ? matchAId[0].length : 0;
-      const aLabelLength = matchALabel !== null ? matchALabel[0].length : 0;
-      const bIdLength = matchBId !== null ? matchBId[0].length : 0;
-      const bLabelLength = matchBLabel !== null ? matchBLabel[0].length : 0;
+        if (b.value === selectedValue) {
+          return 1;
+        }
 
-      const scoreA =
-        (aIdLength / a.id.length + aLabelLength / a.label.length) / 2;
-      const scoreB =
-        (bIdLength / b.id.length + bLabelLength / b.label.length) / 2;
+        const matchAValue = a.value.match(re);
+        const matchALabel = a.label.match(re);
+        const matchBValue = b.value.match(re);
+        const matchBLabel = b.label.match(re);
 
-      if (scoreA > scoreB) {
-        return -1;
-      }
+        const aValueLength = matchAValue !== null ? matchAValue[0].length : 0;
+        const aLabelLength = matchALabel !== null ? matchALabel[0].length : 0;
+        const bValueLength = matchBValue !== null ? matchBValue[0].length : 0;
+        const bLabelLength = matchBLabel !== null ? matchBLabel[0].length : 0;
 
-      if (scoreA < scoreB) {
-        return 1;
-      }
+        const scoreA =
+          (aValueLength / a.value.length + aLabelLength / a.label.length) / 2;
+        const scoreB =
+          (bValueLength / b.value.length + bLabelLength / b.label.length) / 2;
 
-      return 0;
-    })
-    .slice(0, config.search.languages.limit);
-});
+        if (scoreA > scoreB) {
+          return -1;
+        }
+
+        if (scoreA < scoreB) {
+          return 1;
+        }
+
+        return 0;
+      })
+      .slice(0, config.search.languages.limit);
+  },
+);
 
 const filters: FileFilter[] = [
   { name: "JSON", extensions: ["json"] },

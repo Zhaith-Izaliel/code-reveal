@@ -38,6 +38,17 @@ export const config: AppConfig = {
     delay: 200,
   },
 
+  animations: {
+    move: {
+      minDuration: 200,
+      maxDuration: 2000,
+    },
+    fade: {
+      minDuration: 200,
+      maxDuration: 2000,
+    },
+  },
+
   search: {
     languages: {
       limit: 10,

@@ -20,7 +20,7 @@
           <prime-select
             v-model="language"
             optionLabel="label"
-            optionValue="id"
+            optionValue="value"
             class="w-full"
             :options="shownLanguages"
             filter
@@ -59,7 +59,94 @@
     modal
     header="Animation Settings"
     class="w-1/3 xl:w-1/6"
-  ></prime-dialog>
+  >
+    <template #default>
+      <section class="flex flex-col space-y-5 w-full">
+        <div class="flex flex-col space-y-4 w-full">
+          <h2 class="text-md font-semibold">Fade animation</h2>
+          <div class="flex space-x-2 items-center">
+            <float-label variant="on" class="w-1/2">
+              <input-number
+                v-model="slides[selectedIndex].animations.fade.duration"
+                inputId="fade_duration"
+                :min="config.animations.fade.minDuration"
+                :max="config.animations.fade.maxDuration"
+                fluid
+                suffix="ms"
+              />
+              <label for="fade_duration">Fade duration</label>
+            </float-label>
+            <slider
+              v-model="slides[selectedIndex].animations.fade.duration"
+              class="w-full"
+              :min="config.animations.fade.minDuration"
+              :max="config.animations.fade.maxDuration"
+              :step="10"
+            />
+          </div>
+          <float-label variant="on" class="w-full">
+            <prime-select
+              v-model="slides[selectedIndex].animations.fade.ease"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              :options="easingOptions"
+              filter
+              checkmark
+              inputId="fade_ease"
+              fluid
+            />
+            <label for="fade_ease">Easing function</label>
+          </float-label>
+        </div>
+        <hr class="text-zinc-400 dark:text-zinc-600 border" />
+        <div class="flex flex-col space-y-4 w-full">
+          <h2 class="text-md font-semibold">Move animation</h2>
+          <div class="flex space-x-2 items-center">
+            <float-label variant="on" class="w-1/2">
+              <input-number
+                v-model="slides[selectedIndex].animations.move.duration"
+                inputId="move_duration"
+                :min="config.animations.move.minDuration"
+                :max="config.animations.move.maxDuration"
+                fluid
+                suffix="ms"
+              />
+              <label for="move_duration">Move duration</label>
+            </float-label>
+            <slider
+              v-model="slides[selectedIndex].animations.move.duration"
+              class="w-full"
+              :min="config.animations.move.minDuration"
+              :max="config.animations.move.maxDuration"
+              :step="10"
+            />
+          </div>
+          <float-label variant="on" class="w-full">
+            <prime-select
+              v-model="slides[selectedIndex].animations.move.ease"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              :options="easingOptions"
+              filter
+              checkmark
+              inputId="move_ease"
+              fluid
+            />
+            <label for="move_ease">Easing function</label>
+          </float-label>
+        </div>
+      </section>
+    </template>
+    <template #footer>
+      <p class="text-zinc-600 dark:text-zinc-400 text-sm text-center">
+        Easing functions control the rate of change of a property value over
+        time, determining the animation's speed at different points during
+        playback.
+      </p>
+    </template>
+  </prime-dialog>
   <main class="flex h-full w-full">
     <aside
       :class="[

@@ -20,8 +20,11 @@ if (process.contextIsolated) {
       get: (): Promise<Theme> => ipcRenderer.invoke("theme:get"),
     });
     contextBridge.exposeInMainWorld("search", {
-      languages: (query: string): Promise<LanguageOption[]> =>
-        ipcRenderer.invoke("search:languages", query),
+      languages: (
+        query: string,
+        selectedValue: string,
+      ): Promise<LanguageOption[]> =>
+        ipcRenderer.invoke("search:languages", query, selectedValue),
     });
     contextBridge.exposeInMainWorld("save", {
       read: async (): Promise<[Save, string]> =>

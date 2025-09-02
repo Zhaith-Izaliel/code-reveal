@@ -22,8 +22,13 @@ export type SlideData = {
   };
 };
 
+export type EasingOption = {
+  value: EaseStringParamNames;
+  label: string;
+};
+
 export type LanguageOption = {
-  id: string;
+  value: string;
   label: string;
 };
 
@@ -48,6 +53,17 @@ export type AppThumbnailConfig = {
 
 export type AppConfig = {
   thumbnail: AppThumbnailConfig;
+
+  animations: {
+    fade: {
+      minDuration: number;
+      maxDuration: number;
+    };
+    move: {
+      minDuration: number;
+      maxDuration: number;
+    };
+  };
 
   default: {
     slide: SlideData;

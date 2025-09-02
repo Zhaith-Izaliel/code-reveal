@@ -20,6 +20,7 @@ import {
   FloatLabel,
   InputNumber,
   SelectFilterEvent,
+  Slider,
   useToast,
 } from "primevue";
 import Slide from "@renderer/components/Slide/Slide.vue";
@@ -28,6 +29,7 @@ import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
 import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { LanguageOption, Save } from "@/types";
+import easingOptions from "@/config/easing_params";
 
 // function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
 //   if (mode === Mode.Preview) {
@@ -71,6 +73,7 @@ import { LanguageOption, Save } from "@/types";
 export default defineComponent({
   components: {
     PrimeSelect: Select,
+    Slider,
     InputNumber,
     FloatLabel,
     Slide,
@@ -96,12 +99,15 @@ export default defineComponent({
     const shownLanguages = ref<LanguageOption[]>([]);
 
     const searchLanguage = _.debounce(async (event: SelectFilterEvent) => {
-      shownLanguages.value = await window.search.languages(event.value || "");
+      shownLanguages.value = await window.search.languages(
+        event.value || "",
+        language.value,
+      );
     }, config.search.languages.delay);
 
     onMounted(() => {
       window.search
-        .languages(language.value)
+        .languages(language.value, language.value)
         .then((items: LanguageOption[]) => {
           shownLanguages.value = items;
         });
@@ -216,6 +222,8 @@ export default defineComponent({
 
     return {
       ...slidesHook,
+      config,
+      easingOptions,
       // Required props
       codeAreaSize,
       timelineCompleted,
