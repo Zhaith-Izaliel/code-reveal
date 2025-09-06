@@ -22,6 +22,7 @@ import {
   SelectFilterEvent,
   Slider,
   useToast,
+  SelectChangeEvent,
 } from "primevue";
 import Slide from "@renderer/components/Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
@@ -30,45 +31,6 @@ import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
 import { LanguageOption, Save } from "@/types";
 import easingOptions from "@/config/easing_params";
-
-// function parseKeyboardEvent(event: KeyboardEvent, mode: Mode): ActionType {
-//   if (mode === Mode.Preview) {
-//     switch (event.key) {
-//       case "ArrowRight":
-//         return ActionType.PreviewNext;
-//       case "ArrowLeft":
-//         return ActionType.PreviewPrev;
-//       default:
-//         return ActionType.Noop;
-//     }
-//   }
-
-//   return ActionType.Noop;
-// }
-
-// const handleKeys = (event: KeyboardEvent, mode: Mode, actions: Actions) => {
-//   const type = parseKeyboardEvent(event, mode);
-//   const callback = actions.get(type);
-
-//   if (callback) {
-//     callback();
-//   }
-// };
-
-// Actions
-// const createActions = (): Actions => {
-//   const _actions: Actions = new Map();
-//   _actions.set(ActionType.PreviewNext, () => {
-//     selectSlide(selectedIndex.value + 1);
-//   });
-//   _actions.set(ActionType.PreviewPrev, () => {
-//     selectSlide(selectedIndex.value - 1);
-//   });
-
-//   return _actions;
-// };
-//
-// const actions = createActions();
 
 export default defineComponent({
   components: {
@@ -93,17 +55,21 @@ export default defineComponent({
     // Required prop
     const codeAreaSize = ref(1);
     const timelineCompleted = ref(true);
+    const isAnimationPlaying = ref(false);
 
     // Language management
-    const language = ref<string>(config.default.language.id);
+    const language = ref<string>(config.default.language.value);
     const shownLanguages = ref<LanguageOption[]>([]);
 
-    const searchLanguage = _.debounce(async (event: SelectFilterEvent) => {
-      shownLanguages.value = await window.search.languages(
-        event.value || "",
-        language.value,
-      );
-    }, config.search.languages.delay);
+    const searchLanguage = _.debounce(
+      async (event: SelectFilterEvent | SelectChangeEvent) => {
+        shownLanguages.value = await window.search.languages(
+          event.value || "",
+          language.value,
+        );
+      },
+      config.search.languages.delay,
+    );
 
     onMounted(() => {
       window.search
@@ -170,7 +136,6 @@ export default defineComponent({
           life: 6000,
         });
       } catch (err: any) {
-        console.error(err);
         const message = err.message ? err.message : "Couldn't save file.";
 
         toast.add({
@@ -226,6 +191,7 @@ export default defineComponent({
       easingOptions,
       // Required props
       codeAreaSize,
+      isAnimationPlaying,
       timelineCompleted,
       // Language management
       language,

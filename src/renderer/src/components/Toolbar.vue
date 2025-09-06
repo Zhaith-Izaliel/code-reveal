@@ -58,19 +58,19 @@
           />
           <prime-button
             severity="secondary"
-            icon="pi pi-play"
+            :icon="isAnimationPlaying ? 'pi pi-pause' : 'pi pi-play'"
             rounded
-            v-tooltip.bottom="'Play'"
+            v-tooltip.bottom="isAnimationPlaying ? 'Pause' : 'Play'"
             raised
-            @click.prevent="() => emit('play')"
-          />
-          <prime-button
-            severity="secondary"
-            icon="pi pi-pause"
-            rounded
-            v-tooltip.bottom="'Pause'"
-            raised
-            @click.prevent="() => emit('pause')"
+            @click.prevent="
+              () => {
+                if (isAnimationPlaying) {
+                  emit('pause');
+                  return;
+                }
+                emit('play');
+              }
+            "
           />
           <prime-button
             severity="secondary"
@@ -98,24 +98,6 @@
           />
         </template>
         <template v-else>
-          <prime-button
-            severity="secondary"
-            v-tooltip.bottom="'Undo'"
-            raised
-            rounded
-            icon="pi pi-undo"
-            :disabled="slidesNumber === 0"
-            @click.prevent="() => emit('undo')"
-          />
-          <prime-button
-            severity="secondary"
-            v-tooltip.bottom="'Redo'"
-            raised
-            rounded
-            icon="pi pi-refresh"
-            :disabled="slidesNumber === 0"
-            @click.prevent="() => emit('redo')"
-          />
           <prime-button
             severity="secondary"
             v-tooltip.bottom="'Change language'"
@@ -160,12 +142,11 @@ const mode = defineModel<Mode>("mode");
 defineProps<{
   slidesNumber: number;
   modes: ModeOption[];
+  isAnimationPlaying: boolean;
 }>();
 
 const emit = defineEmits([
   // Slides
-  "undo",
-  "redo",
   "clear",
   // Language
   "changeLanguage",

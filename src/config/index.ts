@@ -20,7 +20,7 @@ export const config: AppConfig = {
     },
 
     language: {
-      id: "typescript",
+      value: "typescript",
       label: "TypeScript",
     },
 

@@ -1,5 +1,5 @@
 import { SlideData, Theme } from "@/types";
-import { computed, ref } from "vue";
+import { computed, Ref, ref } from "vue";
 import {
   setTheme as utilsSetTheme,
   generateHighlightedCode,
@@ -40,19 +40,19 @@ export function useHighlightCode() {
 
 // ---- Slides ----
 
-export function useSlides() {
+export function useSlides(defaultSlides: SlideData[] = []) {
   const { config } = window;
   const toast = useToast();
 
-  const slides = ref<SlideData[]>([]);
+  const slides = ref<SlideData[]>(defaultSlides);
   const selectedIndex = ref(0);
 
   const clearSlides = () => {
     slides.value.splice(0, slides.value.length);
     toast.add({
       severity: "success",
-      summary: "Slides.value cleared",
-      detail: "All of the slides.value have been deleted.",
+      summary: "Slides cleared",
+      detail: "All of the slides have been deleted.",
       life: 6000,
     });
   };

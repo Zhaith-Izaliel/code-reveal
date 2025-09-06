@@ -27,10 +27,9 @@ if (process.contextIsolated) {
         ipcRenderer.invoke("search:languages", query, selectedValue),
     });
     contextBridge.exposeInMainWorld("save", {
-      read: async (): Promise<[Save, string]> =>
-        await ipcRenderer.invoke("save:read"),
-      write: async (save: Save, file = "", saveAs = false) =>
-        await ipcRenderer.invoke("save:write", save, file, saveAs),
+      read: (): Promise<[Save, string]> => ipcRenderer.invoke("save:read"),
+      write: (save: Save, file = "", saveAs = false) =>
+        ipcRenderer.invoke("save:write", save, file, saveAs),
     });
   } catch (error) {
     console.error(error);

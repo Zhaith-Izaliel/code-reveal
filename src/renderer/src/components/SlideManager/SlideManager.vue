@@ -27,6 +27,7 @@
             checkmark
             inputId="language_label"
             @filter="searchLanguage"
+            @change="searchLanguage"
             fluid
           />
           <label for="language_label">Select language</label>
@@ -202,6 +203,7 @@
     <section class="w-5/7 xl:w-6/7 h-full px-6 xl:px-12">
       <toolbar
         :slides-number="slides.length"
+        :is-animation-playing="isAnimationPlaying"
         :modes="modes"
         v-model:mode="mode"
         @clear="clearSlides"
@@ -259,8 +261,17 @@
         />
         <slide-preview
           v-else
-          v-model:timeline-completed="timelineCompleted"
           :language="language"
+          @completed="
+            (value: boolean) => {
+              timelineCompleted = value;
+            }
+          "
+          @playing="
+            (value: boolean) => {
+              isAnimationPlaying = value;
+            }
+          "
           :color="save.color"
           :file-name="save.fileName"
           :code-area-size="codeAreaSize"

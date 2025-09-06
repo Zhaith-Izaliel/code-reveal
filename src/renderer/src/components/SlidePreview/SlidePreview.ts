@@ -1,4 +1,11 @@
-import { computed, defineComponent, onBeforeMount, PropType, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  PropType,
+  ref,
+  watch,
+} from "vue";
 
 import { SlideData } from "@/types";
 
@@ -20,16 +27,28 @@ export default defineComponent({
     fileName: { type: String, required: true },
     color: { type: String, required: true },
     codeAreaSize: { type: Number, required: true },
-    timelineCompleted: { type: Boolean, required: true },
   },
 
-  emits: ["update:timelineCompleted"],
+  emits: ["playing", "completed"],
 
   setup(props, { emit }) {
     const { generateHighlightedCode } = useHighlightCode();
     const { generateAnimationsPrimitives, assignTimeline } = useCodeAnimation();
 
     let primitives: DiffAnimationPrimitive[][] = [];
+    const timelineCompleted = ref(false);
+
+    const timeline = createTimeline({
+      onBegin: () => {
+        emit("playing", true);
+        emit("completed", false);
+      },
+      onComplete: () => {
+        timelineCompleted.value = true;
+        emit("playing", false);
+        emit("completed", true);
+      },
+    });
 
     onBeforeMount(() => {
       primitives = generateAnimationsPrimitives(props.slides, props.language);
@@ -40,7 +59,7 @@ export default defineComponent({
     const codeToDisplay = computed(() => {
       if (
         props.selectedSlide === 0 ||
-        props.timelineCompleted ||
+        timelineCompleted.value ||
         primitives.length === 0
       ) {
         return generateHighlightedCode(
@@ -58,20 +77,17 @@ export default defineComponent({
     const generateAndPlayAnimation = () => {
       if (
         props.selectedSlide === 0 ||
-        props.timelineCompleted ||
+        timelineCompleted.value ||
         primitives.length === 0
       ) {
         return;
       }
 
-      const timeline = createTimeline();
       primitives[animationId.value].forEach((item) => {
         assignTimeline(item, timeline, props.slides[props.selectedSlide]);
       });
 
-      timeline.play().then(() => {
-        emit("update:timelineCompleted", true);
-      });
+      timeline.play();
     };
 
     watch(
@@ -81,7 +97,8 @@ export default defineComponent({
           return;
         }
 
-        emit("update:timelineCompleted", false);
+        emit("completed", false);
+        timelineCompleted.value = false;
       },
       { immediate: true },
     );

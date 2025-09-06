@@ -5,22 +5,14 @@ import {
   ipcMain,
   nativeTheme,
   NativeTheme,
-  dialog,
-  SaveDialogOptions,
-  OpenDialogOptions,
-  FileFilter,
 } from "electron";
-import { LanguageOption, Save, TSave, Theme } from "../types";
-import languages from "../config/languages";
-import { config } from "../config";
 
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
-import escape from "regexp.escape";
 import icon from "../../resources/icon.png?asset";
-import { readFileSync, writeFile } from "node:fs";
-import { isLeft } from "fp-ts/lib/Either";
-import { PathReporter } from "io-ts/PathReporter";
+import { searchLanguages } from "./search";
+import { saveRead, saveWrite } from "./save";
+import { Theme } from "../types";
 
 /**
  *
@@ -95,6 +87,8 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+// Theme management
+
 ipcMain.handle("theme:set", (_, theme: NativeTheme["themeSource"]): Theme => {
   nativeTheme.themeSource = theme;
   return nativeTheme.shouldUseDarkColors ? "dark" : "light";
@@ -105,123 +99,11 @@ ipcMain.handle(
   (): Theme => (nativeTheme.shouldUseDarkColors ? "dark" : "light"),
 );
 
-ipcMain.handle(
-  "search:languages",
-  (_, query: string, selectedValue: string): LanguageOption[] => {
-    const re = new RegExp(escape(query), "i");
-    return languages
-      .filter(
-        (item) =>
-          item.value.match(re) !== null ||
-          item.label.match(re) !== null ||
-          item.value === selectedValue,
-      )
-      .sort((a, b) => {
-        if (a.value === selectedValue) {
-          return -1;
-        }
+// Searches
 
-        if (b.value === selectedValue) {
-          return 1;
-        }
+ipcMain.handle("search:languages", searchLanguages);
 
-        const matchAValue = a.value.match(re);
-        const matchALabel = a.label.match(re);
-        const matchBValue = b.value.match(re);
-        const matchBLabel = b.label.match(re);
+// Save Management
 
-        const aValueLength = matchAValue !== null ? matchAValue[0].length : 0;
-        const aLabelLength = matchALabel !== null ? matchALabel[0].length : 0;
-        const bValueLength = matchBValue !== null ? matchBValue[0].length : 0;
-        const bLabelLength = matchBLabel !== null ? matchBLabel[0].length : 0;
-
-        const scoreA =
-          (aValueLength / a.value.length + aLabelLength / a.label.length) / 2;
-        const scoreB =
-          (bValueLength / b.value.length + bLabelLength / b.label.length) / 2;
-
-        if (scoreA > scoreB) {
-          return -1;
-        }
-
-        if (scoreA < scoreB) {
-          return 1;
-        }
-
-        return 0;
-      })
-      .slice(0, config.search.languages.limit);
-  },
-);
-
-const filters: FileFilter[] = [
-  { name: "JSON", extensions: ["json"] },
-  { name: "All Files", extensions: ["*"] },
-];
-
-async function saveDialog(defaultPath?: string): Promise<string> {
-  const dialogOptions: SaveDialogOptions = {
-    defaultPath,
-    filters,
-    properties: ["showOverwriteConfirmation", "createDirectory"],
-  };
-
-  const result = await dialog.showSaveDialog(dialogOptions);
-
-  if (result.canceled || result.filePath.length === 0) {
-    throw Error("No file has been selected");
-  }
-
-  return result.filePath;
-}
-
-async function openDialog(): Promise<string[]> {
-  const dialogOptions: OpenDialogOptions = {
-    filters,
-    properties: ["openFile", "createDirectory"],
-  };
-
-  const result = await dialog.showOpenDialog(dialogOptions);
-  if (result.canceled || result.filePaths.length === 0) {
-    throw Error("No file has been selected");
-  }
-
-  return result.filePaths;
-}
-
-ipcMain.handle("save:read", async (): Promise<[Save, string]> => {
-  const files: string[] = await openDialog();
-
-  if (!files[0]) {
-    throw Error("No file has been selected");
-  }
-
-  const buffer = readFileSync(files[0]);
-  const decoded = TSave.decode(JSON.parse(buffer.toString()));
-  if (isLeft(decoded)) {
-    throw Error(`Could not validate the file ${files[0]}`);
-  }
-
-  return [decoded.right, files[0]];
-});
-
-ipcMain.handle(
-  "save:write",
-  async (_, save: Save, file = "", saveAs = false) => {
-    const decoded = TSave.decode(save);
-
-    if (file === "" || saveAs) {
-      file = await saveDialog(file);
-    }
-
-    if (isLeft(decoded)) {
-      throw Error(
-        `Could not validate data: ${PathReporter.report(decoded).join("\n")}`,
-      );
-    }
-    const decodedSave = decoded.right;
-    writeFile(file, JSON.stringify(decodedSave), (err) => {
-      if (err) throw err;
-    });
-  },
-);
+ipcMain.handle("save:read", saveRead);
+ipcMain.handle("save:write", saveWrite);
