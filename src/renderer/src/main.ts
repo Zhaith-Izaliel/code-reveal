@@ -2,6 +2,11 @@ import { createApp } from "vue";
 import router from "@renderer/router";
 import i18n from "@renderer/i18n";
 import App from "@renderer/App.vue";
+
+// Pinia
+import { createPinia } from "pinia";
+
+// Prime Vue
 import PrimeVue from "primevue/config";
 import Aura from "@primeuix/themes/aura";
 import { definePreset } from "@primeuix/themes";
@@ -32,7 +37,10 @@ const CustomAura = definePreset(Aura, {
   },
 });
 
+const pinia = createPinia();
+
 createApp(App)
+  .use(pinia)
   .use(router)
   .use(i18n)
   .use(PrimeVue, {

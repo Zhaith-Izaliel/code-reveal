@@ -68,7 +68,10 @@
           <div class="flex space-x-2 items-center">
             <float-label variant="on" class="w-1/2">
               <input-number
-                v-model="slides[selectedIndex].animations.fade.duration"
+                v-model="
+                  slidesStore.slides[slidesStore.selectedIndex].animations.fade
+                    .duration
+                "
                 inputId="fade_duration"
                 :min="config.animations.fade.minDuration"
                 :max="config.animations.fade.maxDuration"
@@ -78,7 +81,10 @@
               <label for="fade_duration">Fade duration</label>
             </float-label>
             <slider
-              v-model="slides[selectedIndex].animations.fade.duration"
+              v-model="
+                slidesStore.slides[slidesStore.selectedIndex].animations.fade
+                  .duration
+              "
               class="w-full"
               :min="config.animations.fade.minDuration"
               :max="config.animations.fade.maxDuration"
@@ -87,7 +93,10 @@
           </div>
           <float-label variant="on" class="w-full">
             <prime-select
-              v-model="slides[selectedIndex].animations.fade.ease"
+              v-model="
+                slidesStore.slides[slidesStore.selectedIndex].animations.fade
+                  .ease
+              "
               optionLabel="label"
               optionValue="value"
               class="w-full"
@@ -106,7 +115,10 @@
           <div class="flex space-x-2 items-center">
             <float-label variant="on" class="w-1/2">
               <input-number
-                v-model="slides[selectedIndex].animations.move.duration"
+                v-model="
+                  slidesStore.slides[slidesStore.selectedIndex].animations.move
+                    .duration
+                "
                 inputId="move_duration"
                 :min="config.animations.move.minDuration"
                 :max="config.animations.move.maxDuration"
@@ -116,7 +128,10 @@
               <label for="move_duration">Move duration</label>
             </float-label>
             <slider
-              v-model="slides[selectedIndex].animations.move.duration"
+              v-model="
+                slidesStore.slides[slidesStore.selectedIndex].animations.move
+                  .duration
+              "
               class="w-full"
               :min="config.animations.move.minDuration"
               :max="config.animations.move.maxDuration"
@@ -125,7 +140,10 @@
           </div>
           <float-label variant="on" class="w-full">
             <prime-select
-              v-model="slides[selectedIndex].animations.move.ease"
+              v-model="
+                slidesStore.slides[slidesStore.selectedIndex].animations.move
+                  .ease
+              "
               optionLabel="label"
               optionValue="value"
               class="w-full"
@@ -157,31 +175,32 @@
         },
       ]"
     >
-      <draggable :list="slides" class="space-y-4 mb-4">
+      <draggable :list="slidesStore.slides" class="space-y-4 mb-4">
         <article
           :key="i"
-          v-for="(slide, i) in slides"
-          v-if="slides.length > 0"
+          v-for="(slide, i) in slidesStore.slides"
+          v-if="slidesStore.slides.length > 0"
           :class="[
             `p-0 border rounded-xl w-full cursor-pointer shadow shadow-black/30 dark:shadow-black/80`,
             {
-              'border-surface-300 dark:border-surface-800': selectedIndex !== i,
-              'border-primary-500 border-2': selectedIndex === i,
+              'border-surface-300 dark:border-surface-800':
+                slidesStore.selectedIndex !== i,
+              'border-primary-500 border-2': slidesStore.selectedIndex === i,
             },
           ]"
         >
           <slide-thumbnail
-            @delete="deleteSlide"
-            @duplicate="duplicateSlide"
-            @select="selectSlide"
+            @delete="slidesStore.deleteSlide"
+            @duplicate="slidesStore.duplicateSlide"
+            @select="slidesStore.selectSlide"
             @move-down="
               (i: number) => {
-                swapSlides(i, i + 1);
+                slidesStore.swapSlides(i, i + 1);
               }
             "
             @move-up="
               (i: number) => {
-                swapSlides(i, i - 1);
+                slidesStore.swapSlides(i, i - 1);
               }
             "
             :index="i"
@@ -191,7 +210,7 @@
       </draggable>
       <footer class="text-2xl backdrop-blur-2xl h-preview-slide rounded-xl">
         <prime-button
-          @click.prevent="createSlide"
+          @click.prevent="slidesStore.createSlide"
           severity="secondary"
           v-tooltip.bottom="'Add a new slide'"
           raised
@@ -202,22 +221,22 @@
     </aside>
     <section class="w-5/7 xl:w-6/7 h-full px-6 xl:px-12">
       <toolbar
-        :slides-number="slides.length"
+        :slides-number="slidesStore.slides.length"
         :is-animation-playing="isAnimationPlaying"
         :modes="modes"
         v-model:mode="mode"
-        @clear="clearSlides"
+        @clear="slidesStore.clearSlides"
         @next-slide="
           () => {
             if (timelineCompleted) {
-              selectSlide(selectedIndex + 1, true);
+              slidesStore.selectSlide(slidesStore.selectedIndex + 1, true);
             }
           }
         "
         @prev-slide="
           () => {
             if (timelineCompleted) {
-              selectSlide(selectedIndex - 1, true);
+              slidesStore.selectSlide(slidesStore.selectedIndex - 1, true);
             }
           }
         "
@@ -247,13 +266,15 @@
           }
         "
       />
-      <template v-if="slides[selectedIndex]">
+      <template v-if="slidesStore.slides[slidesStore.selectedIndex]">
         <slide
           v-if="!isPreview"
-          v-model:code="slides[selectedIndex].code"
+          v-model:code="slidesStore.slides[slidesStore.selectedIndex].code"
           v-model:file-name="save.fileName"
           v-model:color="save.color"
-          v-model:thumbnail="slides[selectedIndex].thumbnail"
+          v-model:thumbnail="
+            slidesStore.slides[slidesStore.selectedIndex].thumbnail
+          "
           v-model:code-area-size="codeAreaSize"
           :language="language"
           :indent="indent"
@@ -275,8 +296,8 @@
           :color="save.color"
           :file-name="save.fileName"
           :code-area-size="codeAreaSize"
-          :selected-slide="selectedIndex"
-          :slides="slides"
+          :selected-slide="slidesStore.selectedIndex"
+          :slides="slidesStore.slides"
           class="w-full xl:w-1/2 m-auto mt-8"
         />
       </template>

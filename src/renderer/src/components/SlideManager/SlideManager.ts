@@ -49,7 +49,7 @@ export default defineComponent({
 
   setup() {
     const { config } = window;
-    const slidesHook = useSlides();
+    const slidesStore = useSlides();
     const toast = useToast();
 
     // Required prop
@@ -88,7 +88,7 @@ export default defineComponent({
 
     // Save Management
     const save = ref<Save>({
-      slides: toRaw(slidesHook.slides.value),
+      slides: toRaw(slidesStore.slides),
       fileName: config.default.fileName,
       color: config.default.color,
       indent: indent.value,
@@ -102,7 +102,7 @@ export default defineComponent({
         const tuple = await window.save.read();
         saveLocation.value = tuple[1];
         save.value = tuple[0];
-        slidesHook.slides.value = save.value.slides;
+        slidesStore.slides = save.value.slides;
         toast.add({
           severity: "success",
           summary: "Open",
@@ -150,7 +150,7 @@ export default defineComponent({
     // Modes
     const mode = ref<Mode>("normal");
 
-    const slidesLength = computed((): number => slidesHook.slides.value.length);
+    const slidesLength = computed((): number => slidesStore.slides.length);
 
     const modes = reactive<ModeOption[]>([
       {
@@ -173,7 +173,7 @@ export default defineComponent({
 
     watch(isPreview, (newIsPreview) => {
       if (newIsPreview) {
-        slidesHook.selectSlide(0);
+        slidesStore.selectSlide(0);
       }
     });
 
@@ -186,10 +186,11 @@ export default defineComponent({
     });
 
     return {
-      ...slidesHook,
       config,
-      easingOptions,
+      // Slides
+      slidesStore,
       // Required props
+      easingOptions,
       codeAreaSize,
       isAnimationPlaying,
       timelineCompleted,

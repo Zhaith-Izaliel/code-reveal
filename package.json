@@ -35,6 +35,7 @@
     "lodash": "^4.17.21",
     "luxon": "^3.7.1",
     "material-icons": "^1.13.14",
+    "pinia": "^3.0.3",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.7",
     "prismjs": "^1.30.0",
