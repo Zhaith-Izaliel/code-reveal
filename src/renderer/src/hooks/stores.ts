@@ -1,7 +1,7 @@
-import { ref } from "vue";
+import { ref, toRaw } from "vue";
 import { defineStore } from "pinia";
 import { useToast } from "primevue";
-import { SlideData } from "@/types";
+import { Save, SlideData } from "@/types";
 
 export const useSlides = defineStore("slides", () => {
   const { config } = window;
@@ -75,3 +75,83 @@ export const useSlides = defineStore("slides", () => {
     swapSlides,
   };
 });
+
+export const useSave = defineStore("save", () => {
+  const { config } = window;
+  const toast = useToast();
+  const slidesStore = useSlides();
+
+  const language = ref<string>(config.default.language.value);
+  const indent = ref<number>(config.default.indent);
+
+  const save = ref<Save>({
+    slides: toRaw(slidesStore.slides),
+    fileName: config.default.fileName,
+    color: config.default.color,
+    indent: indent.value,
+    language: language.value,
+  });
+
+  const saveLocation = ref<string>("");
+
+  const readSave = async () => {
+    try {
+      const tuple = await window.save.read();
+      saveLocation.value = tuple[1];
+      save.value = tuple[0];
+      slidesStore.slides = save.value.slides;
+      toast.add({
+        severity: "success",
+        summary: "Open",
+        detail: "The file has been opened successfully.",
+        life: 6000,
+      });
+    } catch (err: any) {
+      const message = err.message ? err.message : "Couldn't open file.";
+      toast.add({
+        severity: "error",
+        summary: "Open",
+        detail: message,
+        life: 6000,
+      });
+    }
+  };
+
+  const writeSave = async (file = "", saveAs = false) => {
+    try {
+      await window.save.write(
+        // HACK: I would prefer to use toRaw but it fails with some arrays.
+        JSON.parse(JSON.stringify(save.value)),
+        file,
+        saveAs,
+      );
+
+      toast.add({
+        severity: "success",
+        summary: "Save",
+        detail: "The file has been saved successfully.",
+        life: 6000,
+      });
+    } catch (err: any) {
+      const message = err.message ? err.message : "Couldn't save file.";
+
+      toast.add({
+        severity: "error",
+        summary: "Save",
+        detail: message,
+        life: 6000,
+      });
+    }
+  };
+
+  return {
+    save,
+    saveLocation,
+    language,
+    indent,
+    readSave,
+    writeSave,
+  };
+});
+
+export const useAnimationTimeline = defineStore("timeline", () => {});

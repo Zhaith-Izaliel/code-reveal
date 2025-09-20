@@ -1,70 +1,71 @@
+import { computed, defineComponent, onBeforeMount, ref, watch } from "vue";
+
 import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  PropType,
-  ref,
-  watch,
-} from "vue";
-
-import { SlideData } from "@/types";
-
-import { useCodeAnimation, useHighlightCode } from "@renderer/hooks";
+  useCodeAnimation,
+  useHighlightCode,
+  useSave,
+  useSlides,
+} from "@renderer/hooks";
 import { DiffAnimationPrimitive } from "@renderer/types";
 import { createTimeline } from "animejs";
 
+import { Button } from "primevue";
 import CodeWindow from "@renderer/components/CodeWindow.vue";
 
 export default defineComponent({
   components: {
     CodeWindow,
+    PrimeButton: Button,
   },
 
   props: {
-    language: { type: String, required: true },
-    slides: { type: Array as PropType<SlideData[]>, required: true },
-    selectedSlide: { type: Number, required: true },
-    fileName: { type: String, required: true },
-    color: { type: String, required: true },
     codeAreaSize: { type: Number, required: true },
   },
 
   emits: ["playing", "completed"],
 
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     const { generateHighlightedCode } = useHighlightCode();
     const { generateAnimationsPrimitives, assignTimeline } = useCodeAnimation();
+    const slidesStore = useSlides();
+    const saveStore = useSave();
+
+    const completed = ref(true);
+    const playing = ref<boolean>(false);
 
     let primitives: DiffAnimationPrimitive[][] = [];
-    const timelineCompleted = ref(false);
 
     const timeline = createTimeline({
       onBegin: () => {
-        emit("playing", true);
-        emit("completed", false);
+        playing.value = true;
+        completed.value = false;
       },
       onComplete: () => {
-        timelineCompleted.value = true;
-        emit("playing", false);
-        emit("completed", true);
+        completed.value = true;
+        playing.value = true;
       },
     });
 
     onBeforeMount(() => {
-      primitives = generateAnimationsPrimitives(props.slides, props.language);
+      primitives = generateAnimationsPrimitives(
+        slidesStore.slides,
+        saveStore.save.language,
+      );
     });
 
-    const animationId = computed(() => Math.max(0, props.selectedSlide - 1));
-    const slideId = computed(() => props.selectedSlide);
+    const animationId = computed(() =>
+      Math.max(0, slidesStore.selectedIndex - 1),
+    );
+    const slideId = computed(() => slidesStore.selectedIndex);
     const codeToDisplay = computed(() => {
       if (
-        props.selectedSlide === 0 ||
-        timelineCompleted.value ||
+        slidesStore.selectedIndex === 0 ||
+        completed.value ||
         primitives.length === 0
       ) {
         return generateHighlightedCode(
-          props.slides[props.selectedSlide].code,
-          props.language,
+          slidesStore.slides[slidesStore.selectedIndex].code,
+          saveStore.save.language,
         );
       }
 
@@ -76,15 +77,19 @@ export default defineComponent({
 
     const generateAndPlayAnimation = () => {
       if (
-        props.selectedSlide === 0 ||
-        timelineCompleted.value ||
+        slidesStore.selectedIndex === 0 ||
+        completed.value ||
         primitives.length === 0
       ) {
         return;
       }
 
       primitives[animationId.value].forEach((item) => {
-        assignTimeline(item, timeline, props.slides[props.selectedSlide]);
+        assignTimeline(
+          item,
+          timeline,
+          slidesStore.slides[slidesStore.selectedIndex],
+        );
       });
 
       timeline.play();
@@ -98,11 +103,18 @@ export default defineComponent({
         }
 
         emit("completed", false);
-        timelineCompleted.value = false;
+        completed.value = false;
       },
       { immediate: true },
     );
 
-    return { codeToDisplay, generateAndPlayAnimation };
+    return {
+      save: saveStore.save,
+      slidesStore,
+      codeToDisplay,
+      generateAndPlayAnimation,
+      playing,
+      completed,
+    };
   },
 });

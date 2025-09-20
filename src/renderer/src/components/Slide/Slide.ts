@@ -1,19 +1,31 @@
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref, onMounted, onUnmounted } from "vue";
 
-import { AppThumbnailConfig } from "@/types";
+import { AppThumbnailConfig, LanguageOption } from "@/types";
 
 import _ from "lodash";
 import { toPng } from "html-to-image";
-import { useHighlightCode } from "@renderer/hooks";
+import { useHighlightCode, useSave, useSlides } from "@renderer/hooks";
 import { indent } from "@renderer/utils";
+import easingOptions from "@/config/easing_params";
 
-import { ColorPicker } from "primevue";
+import {
+  ColorPicker,
+  SelectChangeEvent,
+  SelectFilterEvent,
+  Button,
+  Dialog,
+  Select,
+  FloatLabel,
+  InputNumber,
+  Slider,
+  useConfirm,
+} from "primevue";
 import CodeWindow from "@renderer/components/CodeWindow.vue";
 
 async function generateThumbnail(
   el: HTMLElement | null,
   thumbnailConfig: AppThumbnailConfig,
-) {
+): Promise<string> {
   if (!el) {
     return "";
   }
@@ -35,32 +47,29 @@ export default defineComponent({
   components: {
     ColorPicker,
     CodeWindow,
+    PrimeButton: Button,
+    PrimeSelect: Select,
+    PrimeDialog: Dialog,
+    FloatLabel,
+    InputNumber,
+    Slider,
   },
 
-  emits: [
-    "update:code",
-    "update:color",
-    "update:fileName",
-    "update:thumbnail",
-    "update:codeAreaSize",
-  ],
+  emits: ["update:codeAreaSize"],
 
   props: {
-    language: { type: String, required: true },
-    indent: { type: Number, required: true },
-    code: { type: String, required: true },
-    color: { type: String, required: true },
-    fileName: { type: String, required: true },
-    thumbnail: { type: String, required: true },
     codeAreaSize: { type: Number, required: true },
   },
 
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     const { config } = window;
+    const slidesStore = useSlides();
+    const saveStore = useSave();
+    const confirm = useConfirm();
     const { generateHighlightedCode } = useHighlightCode();
 
     const updateFileName = (event: Event) => {
-      emit("update:fileName", (event.target as HTMLInputElement).value);
+      saveStore.save.fileName = (event.target as HTMLInputElement).value;
     };
 
     const updateCode = (event: Event) => {
@@ -69,19 +78,27 @@ export default defineComponent({
         return;
       }
 
-      emit("update:code", el.value);
+      slidesStore.slides[slidesStore.selectedIndex].code = el.value;
       emit("update:codeAreaSize", el.scrollHeight);
     };
 
     const highlightedCode = computed((): string =>
-      generateHighlightedCode(props.code, props.language),
+      generateHighlightedCode(
+        slidesStore.slides[slidesStore.selectedIndex].code,
+        saveStore.save.language,
+      ),
     );
 
-    const fileNameInputSize = computed(() => props.fileName.length);
+    const fileNameInputSize = computed(() => saveStore.save.fileName.length);
 
     const updateThumbnail = _.debounce(async (el) => {
-      emit("update:thumbnail", await generateThumbnail(el, config.thumbnail));
+      slidesStore.slides[slidesStore.selectedIndex].thumbnail =
+        await generateThumbnail(el, config.thumbnail);
     }, config.thumbnail.delay);
+
+    onUnmounted(() => {
+      updateThumbnail.cancel();
+    });
 
     const handleTab = (event: KeyboardEvent) => {
       const el = event.target as HTMLTextAreaElement;
@@ -93,10 +110,10 @@ export default defineComponent({
 
         el.value =
           el.value.substring(0, start) +
-          indent(" ", props.indent) +
+          indent(" ", saveStore.save.indent) +
           el.value.substring(end);
 
-        el.selectionStart = el.selectionEnd = start + props.indent;
+        el.selectionStart = el.selectionEnd = start + saveStore.save.indent;
 
         el.dispatchEvent(new Event("input"));
 
@@ -104,13 +121,75 @@ export default defineComponent({
       }
     };
 
+    // Language management
+    const shownLanguages = ref<LanguageOption[]>([]);
+
+    const searchLanguage = _.debounce(
+      async (event: SelectFilterEvent | SelectChangeEvent) => {
+        shownLanguages.value = await window.search.languages(
+          event.value || "",
+          saveStore.language,
+        );
+      },
+      config.search.languages.delay,
+    );
+
+    onMounted(() => {
+      window.search
+        .languages(saveStore.language, saveStore.language)
+        .then((items: LanguageOption[]) => {
+          shownLanguages.value = items;
+        });
+    });
+
+    // Modals Bools
+    const changeLanguageModalVisible = ref(false);
+    const animationSettingsModalVisible = ref(false);
+
+    // Confirm
+    const confirmClear = () => {
+      confirm.require({
+        message: "This action will delete all the slides in the presentation.",
+        header: "Confirmation",
+        icon: "pi pi-exclamation-triangle",
+        rejectProps: {
+          label: "Cancel",
+          severity: "secondary",
+          outlined: true,
+        },
+        acceptProps: {
+          label: "Delete",
+          severity: "danger",
+        },
+        accept: () => slidesStore.clearSlides,
+      });
+    };
+
     return {
+      config,
+      // Slides
+      slidesStore,
+      // Inputs
       fileNameInputSize,
       highlightedCode,
       updateFileName,
       updateThumbnail,
       updateCode,
       handleTab,
+      // Required props
+      easingOptions,
+      // Language management
+      searchLanguage,
+      shownLanguages,
+      // Modals
+      animationSettingsModalVisible,
+      changeLanguageModalVisible,
+      confirmClear,
+      // Save management
+      save: saveStore.save,
+      saveLocation: saveStore.saveLocation,
+      readSave: saveStore.readSave,
+      writeSave: saveStore.writeSave,
     };
   },
 });

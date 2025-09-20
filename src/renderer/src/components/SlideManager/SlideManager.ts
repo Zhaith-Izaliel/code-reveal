@@ -1,158 +1,39 @@
-import {
-  computed,
-  defineComponent,
-  onMounted,
-  reactive,
-  ref,
-  toRaw,
-  watch,
-} from "vue";
+import { computed, defineComponent, reactive, ref, watch } from "vue";
 
 import _ from "lodash";
 import { Mode, ModeOption } from "@renderer/types";
 
-import { useSlides } from "@renderer/hooks";
+import { useSave, useSlides } from "@renderer/hooks";
 
-import {
-  Button,
-  Dialog,
-  Select,
-  FloatLabel,
-  InputNumber,
-  SelectFilterEvent,
-  Slider,
-  useToast,
-  SelectChangeEvent,
-} from "primevue";
+import { SelectButton, Button, SplitButton } from "primevue";
 import Slide from "@renderer/components/Slide/Slide.vue";
 import SlideThumbnail from "@renderer/components/SlideThumbnail.vue";
 import SlidePreview from "@renderer/components/SlidePreview/SlidePreview.vue";
-import Toolbar from "@renderer/components/Toolbar.vue";
 import { VueDraggableNext } from "vue-draggable-next";
-import { LanguageOption, Save } from "@/types";
-import easingOptions from "@/config/easing_params";
 
 export default defineComponent({
   components: {
-    PrimeSelect: Select,
-    Slider,
-    InputNumber,
-    FloatLabel,
+    SelectButton,
     Slide,
     SlidePreview,
     draggable: VueDraggableNext,
     SlideThumbnail,
     PrimeButton: Button,
-    Toolbar,
-    PrimeDialog: Dialog,
+    SplitButton,
   },
 
   setup() {
     const { config } = window;
     const slidesStore = useSlides();
-    const toast = useToast();
+    const { readSave, writeSave, saveLocation } = useSave();
 
     // Required prop
     const codeAreaSize = ref(1);
-    const timelineCompleted = ref(true);
-    const isAnimationPlaying = ref(false);
-
-    // Language management
-    const language = ref<string>(config.default.language.value);
-    const shownLanguages = ref<LanguageOption[]>([]);
-
-    const searchLanguage = _.debounce(
-      async (event: SelectFilterEvent | SelectChangeEvent) => {
-        shownLanguages.value = await window.search.languages(
-          event.value || "",
-          language.value,
-        );
-      },
-      config.search.languages.delay,
-    );
-
-    onMounted(() => {
-      window.search
-        .languages(language.value, language.value)
-        .then((items: LanguageOption[]) => {
-          shownLanguages.value = items;
-        });
-    });
-
-    // Indent Management
-    const indent = ref<number>(config.default.indent);
-
-    // Modals Bools
-    const changeLanguageModalVisible = ref(false);
-    const animationSettingsModalVisible = ref(false);
-
-    // Save Management
-    const save = ref<Save>({
-      slides: toRaw(slidesStore.slides),
-      fileName: config.default.fileName,
-      color: config.default.color,
-      indent: indent.value,
-      language: language.value,
-    });
-
-    const saveLocation = ref<string>("");
-
-    const readSave = async () => {
-      try {
-        const tuple = await window.save.read();
-        saveLocation.value = tuple[1];
-        save.value = tuple[0];
-        slidesStore.slides = save.value.slides;
-        toast.add({
-          severity: "success",
-          summary: "Open",
-          detail: "The file has been opened successfully.",
-          life: 6000,
-        });
-      } catch (err: any) {
-        const message = err.message ? err.message : "Couldn't open file.";
-        toast.add({
-          severity: "error",
-          summary: "Open",
-          detail: message,
-          life: 6000,
-        });
-      }
-    };
-
-    const writeSave = async (file = "", saveAs = false) => {
-      try {
-        await window.save.write(
-          // HACK: I would prefer to use toRaw but it fails with some arrays.
-          JSON.parse(JSON.stringify(save.value)),
-          file,
-          saveAs,
-        );
-
-        toast.add({
-          severity: "success",
-          summary: "Save",
-          detail: "The file has been saved successfully.",
-          life: 6000,
-        });
-      } catch (err: any) {
-        const message = err.message ? err.message : "Couldn't save file.";
-
-        toast.add({
-          severity: "error",
-          summary: "Save",
-          detail: message,
-          life: 6000,
-        });
-      }
-    };
 
     // Modes
     const mode = ref<Mode>("normal");
 
-    const slidesLength = computed((): number => slidesStore.slides.length);
-
-    const modes = reactive<ModeOption[]>([
+    const modes = ref<ModeOption[]>([
       {
         label: "Normal",
         value: "normal",
@@ -177,37 +58,56 @@ export default defineComponent({
       }
     });
 
-    watch(slidesLength, (newLength: number) => {
-      const previewIdx = modes.findIndex((item) => item.value === "preview");
+    const slidesLength = computed((): number => slidesStore.slides.length);
+
+    watch(slidesLength, (newLength) => {
+      const previewIdx = modes.value.findIndex(
+        (item) => item.value === "preview",
+      );
 
       if (previewIdx !== -1) {
-        modes[previewIdx].disabled = newLength <= 1;
+        modes.value[previewIdx].disabled = newLength <= 1;
       }
     });
+
+    const openButton = {
+      label: "Open",
+      icon: "pi pi-file-import",
+      command: async () => {
+        await readSave();
+      },
+    };
+
+    const saveMenuItems = [
+      {
+        label: "Save as",
+        icon: "pi pi-file-export",
+        command: async () => {
+          await writeSave(saveLocation, true);
+        },
+      },
+      {
+        label: "Export video",
+        icon: "pi pi-video",
+        command: () => {},
+      },
+      {
+        separator: true,
+      },
+      openButton,
+    ];
 
     return {
       config,
       // Slides
       slidesStore,
       // Required props
-      easingOptions,
       codeAreaSize,
-      isAnimationPlaying,
-      timelineCompleted,
-      // Language management
-      language,
-      searchLanguage,
-      shownLanguages,
-      // Indent management
-      indent,
-      // Modals
-      animationSettingsModalVisible,
-      changeLanguageModalVisible,
-      // Save management
-      save,
-      saveLocation,
-      readSave,
+      // Save Menu
+      openButton,
+      saveMenuItems,
       writeSave,
+      saveLocation,
       // Mode
       mode,
       modes,
