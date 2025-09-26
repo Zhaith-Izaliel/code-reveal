@@ -4,8 +4,17 @@ import {
   setTheme as utilsSetTheme,
   generateHighlightedCode,
 } from "@renderer/utils";
-import { DiffAnimationPrimitive, CodeDiff } from "@renderer/types";
-import diff, { DELETE, INSERT, EQUAL } from "fast-diff";
+import {
+  DiffAnimationPrimitive,
+  CodeDiff,
+  SlideDiff,
+  INSERT,
+  EQUAL,
+  DELETE,
+  FINAL,
+  FINAL_CODE,
+} from "@renderer/types";
+import diff from "fast-diff";
 import ShortUniqueId from "short-unique-id";
 import { Timeline } from "animejs";
 
@@ -50,8 +59,8 @@ function generateElement(id: string, content: string, style: string): string {
   return `<span id="${id}" class="absolute" style="${style}">${content}</span>`;
 }
 
-function generateDiffs(slides: SlideData[], language: string): CodeDiff[][] {
-  let entries: CodeDiff[][] = [];
+function generateDiffs(slides: SlideData[], language: string): SlideDiff[] {
+  let entries: SlideDiff[] = [];
 
   for (let i = 0; i < slides.length - 1; i++) {
     const codeDiff = diff(slides[i].code, slides[i + 1].code);
@@ -81,16 +90,23 @@ function generateDiffs(slides: SlideData[], language: string): CodeDiff[][] {
       });
     });
 
-    entries.push(finalDiff);
+    entries.push({
+      diffs: finalDiff,
+      finalCode: generateHighlightedCode(slides[i + 1].code, language),
+    });
   }
 
   return entries;
 }
 
 function generatePrimitivesForDiff(
-  items: CodeDiff[],
+  slideDiff: SlideDiff,
 ): DiffAnimationPrimitive[] {
-  const primitives: DiffAnimationPrimitive[] = [];
+  const items = slideDiff.diffs;
+
+  let primitives: DiffAnimationPrimitive[] = [];
+
+  const finalPrimitives: DiffAnimationPrimitive[] = [];
 
   // Row number before operations
   let fromTop = 0;
@@ -165,6 +181,14 @@ function generatePrimitivesForDiff(
             break;
         }
       }
+      // Fade out the primitive at the end of the animation for the current slide
+      if (op === EQUAL || op === INSERT) {
+        finalPrimitives.push({
+          id,
+          op: FINAL,
+          opacity: { from: 1, to: 0 },
+        });
+      }
     }
 
     if (op !== DELETE) {
@@ -184,6 +208,21 @@ function generatePrimitivesForDiff(
       }
     }
   }
+
+  primitives = primitives.concat(finalPrimitives);
+
+  // Push the last primitive, i.e. the final code of the slide
+  const id = generateId();
+  primitives.push({
+    id,
+    el: generateElement(
+      id,
+      slideDiff.finalCode,
+      `top: 0rem; left: 0ch; opacity: 0`,
+    ),
+    op: FINAL_CODE,
+    opacity: { from: 0, to: 1 },
+  });
 
   return primitives.map((prim) => {
     if (prim.top) {
@@ -237,6 +276,34 @@ const assignTimeline = (
             opacity: primitive.opacity,
           },
           slide.animations.move.duration + slide.animations.fade.duration,
+        );
+      }
+      return;
+
+    case FINAL:
+      if (primitive.opacity) {
+        timeline.add(
+          `#${primitive.id}`,
+          {
+            duration: slide.animations.fade.duration,
+            ease: slide.animations.fade.ease,
+            opacity: primitive.opacity,
+          },
+          slide.animations.move.duration + slide.animations.fade.duration * 2.5,
+        );
+      }
+      return;
+
+    case FINAL_CODE:
+      if (primitive.opacity) {
+        timeline.add(
+          `#${primitive.id}`,
+          {
+            duration: slide.animations.fade.duration,
+            ease: slide.animations.fade.ease,
+            opacity: primitive.opacity,
+          },
+          slide.animations.move.duration + slide.animations.fade.duration * 2,
         );
       }
       return;

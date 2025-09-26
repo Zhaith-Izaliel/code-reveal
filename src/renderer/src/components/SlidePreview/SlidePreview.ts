@@ -58,11 +58,7 @@ export default defineComponent({
     );
     const slideId = computed(() => slidesStore.selectedIndex);
     const codeToDisplay = computed(() => {
-      if (
-        slidesStore.selectedIndex === 0 ||
-        completed.value ||
-        primitives.length === 0
-      ) {
+      if (slidesStore.selectedIndex === 0 || primitives.length === 0) {
         return generateHighlightedCode(
           slidesStore.slides[slidesStore.selectedIndex].code,
           saveStore.save.language,
@@ -70,7 +66,7 @@ export default defineComponent({
       }
 
       return primitives[animationId.value].reduce(
-        (acc, item) => acc + item.el,
+        (acc, item) => acc + (item.el ? item.el : ""),
         "",
       );
     });
